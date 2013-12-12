@@ -21,13 +21,13 @@ from astropy.setup_helpers import (register_commands, adjust_compiler,
 from astropy.version_helpers import get_git_devstr, generate_version_py
 
 # Set affiliated package-specific settings
-PACKAGENAME = 'packagename'
-DESCRIPTION = 'Astropy affiliated package'
-LONG_DESCRIPTION = ''
-AUTHOR = ''
-AUTHOR_EMAIL = ''
+PACKAGENAME = 'FITS_tools'
+DESCRIPTION = 'Tools for manipulating FITS images using primarily scipy & native python routines'
+LONG_DESCRIPTION=''
 LICENSE = 'BSD'
-URL = 'http://astropy.org'
+URL = 'http://astropy.org' # TODO: get our own?
+AUTHOR_EMAIL = 'adam.g.ginsburg@gmail.com'
+AUTHOR = 'Adam Ginsburg'
 
 # VERSION should be PEP386 compatible (http://www.python.org/dev/peps/pep-0386)
 VERSION = '0.0.dev'
@@ -99,8 +99,8 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      requires=['astropy'],
-      install_requires=['astropy'],
+      requires=['astropy','scipy'],
+      install_requires=['astropy','scipy'],
       provides=[PACKAGENAME],
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
