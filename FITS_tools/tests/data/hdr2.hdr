@@ -1,0 +1,50 @@
+SIMPLE  =                    T / Written by IDL:  Wed Feb  2 13:09:38 2011
+BITPIX  =                  -32 /
+NAXIS   =                    2 /
+NAXIS1  =                 1850 / NUMBER OF ELEMENTS ALONG THIS AXIS
+NAXIS2  =                 1920 / NUMBER OF ELEMENTS ALONG THIS AXIS
+EXTEND  =                    T / This file may contain FITS extensions
+EQUINOX =            2000.0000 / Mean equinox
+CTYPE1  = 'GLON-TAN'           / WCS projection type for this axis
+CUNIT1  = 'deg     '           / Axis unit
+CRVAL1  =      1.050000000E+01 / World coordinate on this axis
+CRPIX1  =      9.255000000E+02 / Reference pixel on this axis
+CD1_1   =     -1.666666667E-03 / Linear projection matrix
+CD1_2   =      0.000000000E+00 / Linear projection matrix
+CTYPE2  = 'GLAT-TAN'           / WCS projection type for this axis
+CUNIT2  = 'deg     '           / Axis unit
+CRVAL2  =      0.000000000E+00 / World coordinate on this axis
+CRPIX2  =      9.605000000E+02 / Reference pixel on this axis
+CD2_1   =      0.000000000E+00 / Linear projection matrix
+CD2_2   =      1.666666667E-03 / Linear projection matrix
+COMMENT
+SOFTNAME= 'SWarp   '           / The software that processed those data
+SOFTVERS= '2.18.0  '           / Version of the software
+SOFTDATE= '2010-07-05'         / Release date of the software
+SOFTAUTH= 'Emmanuel BERTIN <bertin@iap.fr>' / Maintainer of the software
+SOFTINST= 'IAP  http://www.iap.fr' / Institute
+COMMENT
+AUTHOR  = 'schuller'           / Who ran the software
+ORIGIN  = 'MPIfR   '           / Where it was done
+DATE    = '2011-01-29T20:34:51' / When it was started (GMT)
+COMBINET= 'WEIGHTED'           / COMBINE_TYPE config parameter for SWarp
+COMMENT
+COMMENT  Propagated FITS keywords
+OBJECT  = 'GAL-p10.5'          / Object observed
+MJD-OBS = '2007-11-03T22:01:42' / time of observation
+TELESCOP= 'APEX-12m'           / Telescope name
+FEBE    = 'LABOCA-ABBA'        / Frontend-backend combination
+CREATOR = 'BoA     '           / Bolometer Data Analysis Project
+BUNIT   = 'Jy/beam '           / Physical unit of image
+BMAJ    =      5.061775000E-03 / Beam major axis
+BMIN    =      5.061775000E-03 / Beam minor axis
+BPA     =      0.000000000E+00 / Beam position angle
+COMMENT
+COMMENT  Axis-dependent config parameters
+RESAMPT1= 'LANCZOS3'           / RESAMPLING_TYPE config parameter
+CENTERT1= 'MANUAL  '           / CENTER_TYPE config parameter
+PSCALET1= 'MANUAL  '           / PIXELSCALE_TYPE config parameter
+RESAMPT2= 'LANCZOS3'           / RESAMPLING_TYPE config parameter
+CENTERT2= 'MANUAL  '           / CENTER_TYPE config parameter
+PSCALET2= 'MANUAL  '           / PIXELSCALE_TYPE config parameter
+END

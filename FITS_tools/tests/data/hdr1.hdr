@@ -1,0 +1,19 @@
+SIMPLE  =                    T / file does conform to FITS standard
+BITPIX  =                  -64
+NAXIS   =                    2
+NAXIS1  =                 1549
+NAXIS2  =                  631
+EXTEND  =                    T / FITS dataset may contain extensions
+COMMENT   FITS (Flexible Image Transport System) format is defined in 'Astronomy
+COMMENT   and Astrophysics', volume 376, page 359; bibcode: 2001A&A...376..359H
+CRVAL1  =            8.9843405
+CRVAL2  =         0.0013368895
+CRPIX1  =                774.5
+CRPIX2  =                 319.
+CD1_1   =               -0.002
+CD1_2   =                 -0.0
+CD2_1   =                 -0.0
+CD2_2   =                0.002
+CTYPE1  = 'GLON-CAR'
+CTYPE2  = 'GLAT-CAR'
+END
