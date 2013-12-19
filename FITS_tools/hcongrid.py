@@ -135,9 +135,31 @@ except ImportError:
     def hcongrid(*args, **kwargs):
         raise ImportError("scipy.ndimage could not be imported; hcongrid is not available")
 
-def wcsalign(hdu_in, header, outname=None):
+def wcsalign(hdu_in, header, outname=None, clobber=False):
     """
     Align one FITS image to a specified header
+
+    Requires pyast.
+
+    Parameters
+    ----------
+    hdu_in: fits.PrimaryHDU
+        The HDU to reproject (must have header & data)
+    header: fits.Header
+        The target header to project to
+    outname: str (optional)
+        The filename to write to.
+    clobber: bool
+        Overwrite the file `outname` if it exists
+
+    Returns
+    -------
+    The reprojected fits.PrimaryHDU
+
+    Credits
+    -------
+    Written by David Berry and adapted to functional form by Adam Ginsburg
+    (adam.g.ginsburg@gmail.com)
     """
     import starlink.Ast as Ast
     import starlink.Atl as Atl
@@ -284,6 +306,6 @@ def wcsalign(hdu_in, header, outname=None):
         fitschan_in.writefits()
 
     if outname is not None:
-        hdu_in.writeto(outname, clobber=True)
+        hdu_in.writeto(outname, clobber=clobber)
     
     return hdu_in
