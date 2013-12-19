@@ -86,6 +86,15 @@ try:
         
         return newimage
 
+    def hcongrid_hdu(hdu_in, header, **kwargs):
+        """
+        Wrapper of hcongrid to work on HDUs
+        """
+
+        reproj_image = hcongrid(hdu_in.data, hdu_in.header, header, **kwargs)
+
+        return pyfits.PrimaryHDU(data=reproj_image,header=header)
+
     def zoom_fits(fitsfile, scalefactor, preserve_bad_pixels=True, **kwargs):
         """
         Zoom in on a FITS image by interpolating using scipy.ndimage.zoom
