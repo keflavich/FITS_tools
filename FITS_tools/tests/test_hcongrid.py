@@ -1,5 +1,6 @@
 import numpy as np
 from astropy.io import fits
+from astropy.tests.helper import pytest
 
 header1 = """
 SIMPLE  =                    T / conforms to FITS standard
@@ -54,7 +55,7 @@ END
 
 from ..hcongrid import hcongrid,wcsalign
 
-@pytest.mark.parametrize(('h1','h2'),(('header1','header2','header3'),('header1','header2','header3')))
+@pytest.mark.parametrize(('h1','h2'),zip((header1,header2,header3),(header1,header2,header3)))
 def test_wcsalign_gaussian_smallerpix(h1,h2):
     """
     Reproject different coordinate systems

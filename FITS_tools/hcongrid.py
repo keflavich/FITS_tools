@@ -251,14 +251,14 @@ def wcsalign(hdu_in, header, outname=None):
         # Resample the data array using the above mapping.
         # total_map was pixmap; is this right?
         (npix, out, out_var) = total_map.resample(lbnd_in, ubnd_in,
-                                                  hdu_in[0].data, None,
+                                                  hdu_in.data, None,
                                                   Ast.LINEAR, None, flags,
                                                   0.05, 1000, badval, lbnd_out,
                                                   ubnd_out, lbnd_out, ubnd_out)
  
         #  Store the aligned data in the primary HDU, and update the NAXISi keywords
         #  to hold the number of pixels along each edge of the rotated image.
-        hdu_in[0].data = out
+        hdu_in.data = out
         fitschan_in["NAXIS1"] = ubnd_out[0] - lbnd_out[0] + 1
         fitschan_in["NAXIS2"] = ubnd_out[1] - lbnd_out[1] + 1
 
