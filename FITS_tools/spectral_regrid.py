@@ -23,8 +23,14 @@ def get_spectral_mapping(header1, header2, specaxis1=0, specaxis2=0):
 
     # Convert to common unit frame
     wo = world_out.to(world_in.unit).value
-    wi = world_in.to(world_in.unit).value
 
-    grid = np.interp(wo,wi,xx_in,left=np.nan,right=np.nan)
+    # np.interp requires that the xp points be increasing, but world_in could be decreasing
+    sortinds = np.argsort(world_in)
+    wi = world_in.to(world_in.unit).value[sortinds]
+
+    grid = np.interp(wo,wi,xx_in[sortinds],left=np.nan,right=np.nan)
+
+    if all(np.isnan(grid)):
+        raise ValueError("No overlap between input & output header.")
 
     return grid

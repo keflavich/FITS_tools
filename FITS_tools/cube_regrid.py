@@ -2,10 +2,22 @@ import numpy as np
 import scipy.ndimage
 from .spectral_regrid import get_spectral_mapping
 from .hcongrid import get_pixel_mapping
-from .strip_headers import flatten_header,speccen_header
+from .strip_headers import flatten_header
+from .load_header import load_header
+from astropy.io import fits
+
+def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
+                     clobber=False, **kwargs):
+    cube_hdu = fits.open(cubefilename)[hdu]
+    rgcube = regrid_cube_hdu(cube_hdu, outheader)
+
+    if outfilename:
+        rgcube.writeto(outfilename, clobber=clobber)
+
+    return rgcube
 
 def regrid_cube_hdu(hdu, outheader,**kwargs):
-    return regrid_cube(hdu.data,hdu.header,outheader,**kwargs)
+    return regrid_cube(hdu.data,hdu.header,load_header(outheader),**kwargs)
 
 def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **kwargs):
     """
@@ -53,6 +65,16 @@ def get_cube_mapping(header1, header2):
     Assumptions are spelled out in regrid_cube
     """
     specgrid = get_spectral_mapping(header1,header2,specaxis1=2,specaxis2=2)
+    # pixgrid is returned in the order y,x, which is correct for np array indexing
     pixgrid = get_pixel_mapping(flatten_header(header1),flatten_header(header2))
     
-    return np.meshgrid(pixgrid[0,:,0],pixgrid[1,0,:],specgrid)
+    # spec, lat, lon
+    # copy=False results in a *huge* speed gain on large arrays
+    # indexing='ij' is necessary to prevent weird, arbitrary array shape swappings
+    # (indexing='xy' is the "cartesian grid" convention, which numpy doesn't obey...)
+    # grid = np.meshgrid(specgrid,pixgrid[0,:,0],pixgrid[1,0,:],copy=False,indexing='ij')
+    grid = np.broadcast_arrays(specgrid.reshape(specgrid.size,1,1),
+                               pixgrid[0][np.newaxis,:,:],
+                               pixgrid[1][np.newaxis,:,:],)
+
+    return grid
