@@ -17,7 +17,10 @@ def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
     return rgcube
 
 def regrid_cube_hdu(hdu, outheader,**kwargs):
-    return regrid_cube(hdu.data,hdu.header,load_header(outheader),**kwargs)
+    outheader = load_header(outheader)
+    cubedata = regrid_cube(hdu.data,hdu.header,outheader,**kwargs)
+    newhdu = fits.PrimaryHDU(data=cubedata, header=outheader)
+    return newhdu
 
 def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **kwargs):
     """
