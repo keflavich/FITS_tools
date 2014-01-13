@@ -5,10 +5,13 @@ try:
 except ImportError:
     import pyfits
     import pywcs
+from .strip_headers import flatten_header
 
 def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
     """
     Light wrapper of montage with hcongrid as a backup
+
+    kwargs will be passed to hcongrid if `use_montage==False`
 
     Parameters
     ----------
@@ -51,8 +54,11 @@ def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
         outfile.close()
         temp_headerfile.close()
     elif hcongridOK:
-        image = hcongrid( pyfits.getdata(fitsfile),
-                pyfits.getheader(fitsfile), header)
+        # only works for 2D images
+        image = hcongrid(pyfits.getdata(fitsfile).squeeze(),
+                         flatten_header(pyfits.getheader(fitsfile)),
+                         header,
+                         **kwargs)
 
     return image
 
@@ -82,13 +88,13 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     """
 
     if header is None:
-        header = pyfits.getheader(fitsfile1)
-        image1 = pyfits.getdata(fitsfile1)
+        header = flatten_header(pyfits.getheader(fitsfile1))
+        image1 = pyfits.getdata(fitsfile1).squeeze()
     else: # project image 1 to input header coordinates
-        image1 = project_to_header(fitsfile1, header)
+        image1 = project_to_header(fitsfile1, header, **kwargs)
 
     # project image 2 to image 1 coordinates
-    image2_projected = project_to_header(fitsfile2, header)
+    image2_projected = project_to_header(fitsfile2, header, **kwargs)
 
     if image1.shape != image2_projected.shape:
         raise ValueError("Failed to reproject images to same shape.")

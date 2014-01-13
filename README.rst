@@ -2,4 +2,11 @@
 FITS Tools
 ==========
 
-TO DO: Document!
+
+
+Regridding Tools
+----------------
+
+ * Cube regridding
+ * Image regridding
+ * Spectral regridding
