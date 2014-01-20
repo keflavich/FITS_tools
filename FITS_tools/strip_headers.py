@@ -3,7 +3,7 @@ import astropy.io.fits as pyfits
 def flatten_header(header,delete=False):
     """
     Attempt to turn an N-dimensional fits header into a 2-dimensional header
-    Turns all CRPIX[>2] etc. into new keywords with suffix 'A'
+    Turns all CRPIX[>2] etc. into new keywords with prefix 'A'
 
     header must be a pyfits.Header instance
     """
@@ -23,6 +23,8 @@ def flatten_header(header,delete=False):
                 newheader.rename_key(key,'A'+key,force=True)
             if delete and (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
                 newheader.pop(key)
+            elif (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
+                newheader.rename_key(key,'A'+key[1:],force=True)
         except ValueError:
             # if key[-1] is not an int
             pass
