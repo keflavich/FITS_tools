@@ -7,6 +7,8 @@ from .load_header import load_header,get_cd
 from astropy.io import fits
 from astropy.convolution import convolve,convolve_fft
 from astropy import wcs
+import warnings
+from astropy.convolution import Gaussian2DKernel
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
@@ -134,3 +136,56 @@ def smoothing_kernel_size(hdr_from, hdr_to):
     return widths
 
 
+def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
+                        numcores=None, use_fft=True, **kwargs):
+    """
+    Parallelized spatial smoothing
+
+    Parameters
+    ----------
+    cube: np.ndarray
+        A data cube, with ndim=3
+    kernelwidth: float
+        Width of the kernel.  Defaults to Gaussian.
+    kernel: astropy.convolution.Kernel2D
+        A 2D kernel from astropy
+    cubedim: int
+        The axis to map across.  If you have a normal FITS data cube with
+        AXIS1=RA, AXIS2=Dec, and AXIS3=wavelength, for example, cubedim is 0
+        (because axis3 -> 0, axis2 -> 1, axis1 -> 2)
+    numcores: int
+        Number of cores to use in parallel-processing.
+    use_fft: bool
+        Use convolve_fft or convolve?
+    kwargs: dict
+        Passed to astropy.convolution.convolve
+    """
+    if numcores is not None and numcores > 1:
+        try:
+            import multiprocessing
+            p = multiprocessing.Pool(processes=numcores)
+            map = p.map
+        except ImportError:
+            warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
+        
+    if cubedim != 0:
+        cube = cube.swapaxes(0,cubedim)
+
+    cubelist = [cube[ii,:,:] for ii in xrange(cube.shape[0])]
+
+    kernel = kernel(kernelwidth)
+
+    def smooth(img):
+        if use_fft:
+            return convolve_fft(img, kernel, **kwargs)
+        else:
+            return convolve(img, kernel, **kwargs)
+
+    Psmooth = lambda C: smooth(C,**kwargs)
+
+    smoothcube = array(map(smooth,cubelist))
+    
+    if cubedim != 0:
+        smoothcube = smoothcube.swapaxes(0,cubedim)
+
+    return smoothcube
