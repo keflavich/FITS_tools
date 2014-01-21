@@ -9,6 +9,7 @@ from astropy.convolution import convolve,convolve_fft
 from astropy import wcs
 import warnings
 from astropy.convolution import Gaussian2DKernel
+import itertools
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
@@ -136,6 +137,18 @@ def smoothing_kernel_size(hdr_from, hdr_to):
     return widths
 
 
+def _gsmooth_img(args):
+    """
+    HELPER FUNCTION: private!
+    Smooth an image with a gaussian in 2d
+    """
+    img,kernel,use_fft,kwargs = args
+
+    if use_fft:
+        return convolve_fft(img, kernel, normalize_kernel=True, **kwargs)
+    else:
+        return convolve(img, kernel, normalize_kernel=True, **kwargs)
+
 def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
                         numcores=None, use_fft=True, **kwargs):
     """
@@ -175,15 +188,13 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
 
     kernel = kernel(kernelwidth)
 
-    def smooth(img):
-        if use_fft:
-            return convolve_fft(img, kernel, **kwargs)
-        else:
-            return convolve(img, kernel, **kwargs)
-
-    Psmooth = lambda C: smooth(C,**kwargs)
-
-    smoothcube = array(map(smooth,cubelist))
+    smoothcube = np.array(map(_gsmooth_img,
+                              zip(cubelist,
+                                  itertools.cycle([kernel]),
+                                  itertools.cycle([use_fft]),
+                                  itertools.cycle([kwargs]))
+                              )
+                          )
     
     if cubedim != 0:
         smoothcube = smoothcube.swapaxes(0,cubedim)
