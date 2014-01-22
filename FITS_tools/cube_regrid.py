@@ -102,7 +102,7 @@ def gsmooth_cube(cube, kernelsize, use_fft=True):
         raise ValueError("Wrong number of dimensions for a data cube")
     
     #z,y,x = np.indices(cube.shape)
-    z,y,x = np.indices(np.array(kernelsize)*8)
+    z,y,x = np.indices(np.array(kernelsize)*8+1)
     kernel = np.exp(-((x-x.max()/2.)**2 / (2*kernelsize[2])**2 +
                       (y-y.max()/2.)**2 / (2*kernelsize[1])**2 +
                       (z-z.max()/2.)**2 / (2*kernelsize[0])**2))
