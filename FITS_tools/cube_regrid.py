@@ -94,7 +94,7 @@ def get_cube_mapping(header1, header2):
 
     return grid
 
-def gsmooth_cube(cube, kernelsize, use_fft=True):
+def gsmooth_cube(cube, kernelsize, use_fft=True, **kwargs):
     """
     Smooth a cube with a gaussian in 3d
     """
@@ -109,9 +109,9 @@ def gsmooth_cube(cube, kernelsize, use_fft=True):
                       (z-z.max()/2.)**2 / (2*kernelsize[0])**2))
 
     if use_fft:
-        return convolve_fft(cube, kernel, normalize_kernel=True)
+        return convolve_fft(cube, kernel, normalize_kernel=True, **kwargs)
     else:
-        return convolve(cube, kernel, normalize_kernel=True)
+        return convolve(cube, kernel, normalize_kernel=True, **kwargs)
 
 def smoothing_kernel_size(hdr_from, hdr_to):
     """
