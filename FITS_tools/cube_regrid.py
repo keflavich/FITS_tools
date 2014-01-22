@@ -94,9 +94,13 @@ def get_cube_mapping(header1, header2):
 
     return grid
 
-def gsmooth_cube(cube, kernelsize, use_fft=True, **kwargs):
+def gsmooth_cube(cube, kernelsize, use_fft=True, psf_pad=False, fft_pad=False,
+                 **kwargs):
     """
     Smooth a cube with a gaussian in 3d
+    
+    Because even a tiny cube can become enormous if you have, say, a 1024x32x32
+    cube, padding is off by default
     """
     if cube.ndim != 3:
         raise ValueError("Wrong number of dimensions for a data cube")
@@ -109,7 +113,8 @@ def gsmooth_cube(cube, kernelsize, use_fft=True, **kwargs):
                       (z-z.max()/2.)**2 / (2*kernelsize[0])**2))
 
     if use_fft:
-        return convolve_fft(cube, kernel, normalize_kernel=True, **kwargs)
+        return convolve_fft(cube, kernel, normalize_kernel=True,
+                            psf_pad=psf_pad, fft_pad=fft_pad, **kwargs)
     else:
         return convolve(cube, kernel, normalize_kernel=True, **kwargs)
 
