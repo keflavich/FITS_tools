@@ -186,6 +186,9 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
             map = p.map
         except ImportError:
             warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
+    else:
+        import __builtin__
+        map = __builtin__.map
         
     if cubedim != 0:
         cube = cube.swapaxes(0,cubedim)
