@@ -65,6 +65,11 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
 
     cubedata[bad_pixels] = 0
 
+    if cubedata.ndim != 3:
+        cubedata = cubedata.squeeze()
+        if cubedata.ndim != 3:
+            raise ValueError("Cube has %i dimensions, so it's not a cube." % cubedata.ndim)
+
     newcubedata = scipy.ndimage.map_coordinates(cubedata, grid, **kwargs)
 
     if preserve_bad_pixels:

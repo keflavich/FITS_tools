@@ -73,7 +73,9 @@ try:
 
         wcs = _load_wcs_from_header(header)
 
-        if not (wcs.naxis1 == image.shape[1] and wcs.naxis2 == image.shape[0]):
+        # wcs.naxis attributes are deprecated, so we perform this check conditionally
+        if ((hasattr(wcs,'naxis1') and hasattr(wcs,'naxis2')) and not
+                (wcs.naxis1 == image.shape[1] and wcs.naxis2 == image.shape[0])):
             raise Exception("Image shape must match header shape.")
 
     def get_pixel_mapping(header1, header2):
