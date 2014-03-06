@@ -41,7 +41,7 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
 
     Assumptions:
     
-     * Both the cube and the target are 3-dimensional, with lon/lat/spectral axest
+     * Both the cube and the target are 3-dimensional, with lon/lat/spectral axes
      * Both cube and header use CD/CDELT rather than PC
 
     kwargs will be passed to `scipy.ndimage.map_coordinates`
@@ -49,7 +49,7 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
     Parameters
     ----------
     cubedata : ndarray
-        A two-dimensional image 
+        A three-dimensional data cube
     cubeheader : `pyfits.Header` or `pywcs.WCS`
         The header or WCS corresponding to the image
     targetheader : `pyfits.Header` or `pywcs.WCS`
@@ -73,8 +73,9 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
     newcubedata = scipy.ndimage.map_coordinates(cubedata, grid, **kwargs)
 
     if preserve_bad_pixels:
-        newbad = scipy.ndimage.map_coordinates(bad_pixels, grid, order=0, mode='constant', cval=np.nan)
-        newcubedata[newbad] = np.nan
+        newbad = scipy.ndimage.map_coordinates(bad_pixels, grid, order=0,
+                                               mode='constant', cval=np.nan)
+        newcubedata[newbad.astype('bool')] = np.nan
     
     return newcubedata
 
@@ -100,7 +101,7 @@ def get_cube_mapping(header1, header2):
     return grid
 
 def gsmooth_cube(cube, kernelsize, use_fft=True, psf_pad=False, fft_pad=False,
-                 **kwargs):
+                 kernelsize_mult=8, **kwargs):
     """
     Smooth a cube with a gaussian in 3d
     
@@ -112,10 +113,10 @@ def gsmooth_cube(cube, kernelsize, use_fft=True, psf_pad=False, fft_pad=False,
     
     #z,y,x = np.indices(cube.shape)
     # use an odd kernel size for non-fft, even kernel size for fft
-    z,y,x = np.indices(np.array(kernelsize)*8+(not use_fft))
-    kernel = np.exp(-((x-x.max()/2.)**2 / (2*kernelsize[2])**2 +
-                      (y-y.max()/2.)**2 / (2*kernelsize[1])**2 +
-                      (z-z.max()/2.)**2 / (2*kernelsize[0])**2))
+    z,y,x = np.indices(np.array(kernelsize)*kernelsize_mult+(not use_fft))
+    kernel = np.exp(-((x-x.max()/2.)**2 / (2*(kernelsize[2])**2) +
+                      (y-y.max()/2.)**2 / (2*(kernelsize[1])**2) +
+                      (z-z.max()/2.)**2 / (2*(kernelsize[0])**2)))
 
     if use_fft:
         return convolve_fft(cube, kernel, normalize_kernel=True,
