@@ -8,7 +8,7 @@ from astropy.io import fits
 from astropy.convolution import convolve,convolve_fft
 from astropy import wcs
 import warnings
-from astropy.convolution import Gaussian2DKernel
+from astropy.convolution import Gaussian2DKernel,Gaussian1DKernel
 import itertools
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
@@ -113,7 +113,10 @@ def gsmooth_cube(cube, kernelsize, use_fft=True, psf_pad=False, fft_pad=False,
     
     #z,y,x = np.indices(cube.shape)
     # use an odd kernel size for non-fft, even kernel size for fft
-    z,y,x = np.indices(np.array(kernelsize)*kernelsize_mult+(not use_fft))
+    ks = np.array(kernelsize)*kernelsize_mult
+    if np.any(ks % 2 == 0) and not use_fft:
+        ks[ks % 2 == 0] += 1
+    z,y,x = np.indices(ks)
     kernel = np.exp(-((x-x.max()/2.)**2 / (2*(kernelsize[2])**2) +
                       (y-y.max()/2.)**2 / (2*(kernelsize[1])**2) +
                       (z-z.max()/2.)**2 / (2*(kernelsize[0])**2)))
@@ -215,3 +218,79 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
         smoothcube = smoothcube.swapaxes(0,cubedim)
 
     return smoothcube
+
+def _gsmooth_spectrum(args):
+    """
+    HELPER FUNCTION: private!
+    Smooth a spectrum with a gaussian in 1d
+    """
+    spec,kernel,use_fft,kwargs = args
+
+    if use_fft:
+        return convolve_fft(spec, kernel, normalize_kernel=True, **kwargs)
+    else:
+        return convolve(spec, kernel, normalize_kernel=True, **kwargs)
+
+
+def spectral_smooth(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
+                    parallel=True, numcores=None, use_fft=False, **kwargs):
+    """
+    Parallelized spectral smoothing
+
+    Parameters
+    ----------
+    cube: np.ndarray
+        A data cube, with ndim=3
+    kernelwidth: float
+        Width of the kernel.  Defaults to Gaussian.
+    kernel: astropy.convolution.Kernel1D
+        A 1D kernel from astropy
+    cubedim: int
+        The axis *NOT* to map across, i.e. the spectral axis.  If you have a
+        normal FITS data cube with AXIS1=RA, AXIS2=Dec, and AXIS3=wavelength,
+        for example, cubedim is 0 (because axis3 -> 0, axis2 -> 1, axis1 -> 2)
+    numcores: int
+        Number of cores to use in parallel-processing.
+    use_fft: bool
+        Use convolve_fft or convolve?
+    kwargs: dict
+        Passed to astropy.convolution.convolve
+    """
+
+    if numcores is not None and numcores > 1:
+        try:
+            import multiprocessing
+            p = multiprocessing.Pool(processes=numcores)
+            map = p.map
+        except ImportError:
+            warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
+    else:
+        import __builtin__
+        map = __builtin__.map
+        
+    if cubedim != 0:
+        cube = cube.swapaxes(0,cubedim)
+
+    shape = cube.shape
+
+    cubelist = [cube[:,jj,ii]
+                for jj in xrange(cube.shape[1])
+                for ii in xrange(cube.shape[2])]
+
+    kernel = kernel(kernelwidth)
+
+    smoothcube = np.array(map(_gsmooth_spectrum,
+                              zip(cubelist,
+                                  itertools.cycle([kernel]),
+                                  itertools.cycle([use_fft]),
+                                  itertools.cycle([kwargs]))
+                              )
+                          )
+
+    smoothcube = smoothcube.reshape(shape)
+    
+    if cubedim != 0:
+        smoothcube = smoothcube.swapaxes(0,cubedim)
+
+    return smoothcube
+
