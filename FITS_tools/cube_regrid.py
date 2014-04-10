@@ -188,16 +188,6 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
     kwargs: dict
         Passed to astropy.convolution.convolve
     """
-    if numcores is not None and numcores > 1:
-        try:
-            import multiprocessing
-            p = multiprocessing.Pool(processes=numcores)
-            map = p.map
-        except ImportError:
-            warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
-    else:
-        import __builtin__
-        map = __builtin__.map
         
     if cubedim != 0:
         cube = cube.swapaxes(0,cubedim)
@@ -206,14 +196,15 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
 
     kernel = kernel(kernelwidth)
 
-    smoothcube = np.array(map(_gsmooth_img,
-                              zip(cubelist,
-                                  itertools.cycle([kernel]),
-                                  itertools.cycle([use_fft]),
-                                  itertools.cycle([kwargs]))
+    with _map_context(numcores) as map:
+        smoothcube = np.array(map(_gsmooth_img,
+                                  zip(cubelist,
+                                      itertools.cycle([kernel]),
+                                      itertools.cycle([use_fft]),
+                                      itertools.cycle([kwargs]))
+                                  )
                               )
-                          )
-    
+
     if cubedim != 0:
         smoothcube = smoothcube.swapaxes(0,cubedim)
 
@@ -232,8 +223,9 @@ def _gsmooth_spectrum(args):
         return convolve(spec, kernel, normalize_kernel=True, **kwargs)
 
 
-def spectral_smooth(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
-                    parallel=True, numcores=None, use_fft=False, **kwargs):
+def spectral_smooth_cube(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
+                         parallel=True, numcores=None, use_fft=False,
+                         **kwargs):
     """
     Parallelized spectral smoothing
 
@@ -257,17 +249,6 @@ def spectral_smooth(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
         Passed to astropy.convolution.convolve
     """
 
-    if numcores is not None and numcores > 1:
-        try:
-            import multiprocessing
-            p = multiprocessing.Pool(processes=numcores)
-            map = p.map
-        except ImportError:
-            warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
-    else:
-        import __builtin__
-        map = __builtin__.map
-        
     if cubedim != 0:
         cube = cube.swapaxes(0,cubedim)
 
@@ -279,18 +260,43 @@ def spectral_smooth(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
 
     kernel = kernel(kernelwidth)
 
-    smoothcube = np.array(map(_gsmooth_spectrum,
-                              zip(cubelist,
-                                  itertools.cycle([kernel]),
-                                  itertools.cycle([use_fft]),
-                                  itertools.cycle([kwargs]))
+    with _map_context(numcores) as map:
+        smoothcube = np.array(map(_gsmooth_spectrum,
+                                  zip(cubelist,
+                                      itertools.cycle([kernel]),
+                                      itertools.cycle([use_fft]),
+                                      itertools.cycle([kwargs]))
+                                  )
                               )
-                          )
 
-    smoothcube = smoothcube.reshape(shape)
+    # empirical: need to swapaxes to get shape right
+    # cube = np.arange(6*5*4).reshape([4,5,6]).swapaxes(0,2)
+    # cubelist.T.reshape(cube.shape) == cube
+    smoothcube = smoothcube.T.reshape(shape)
     
     if cubedim != 0:
         smoothcube = smoothcube.swapaxes(0,cubedim)
 
     return smoothcube
 
+from contextlib import contextmanager
+
+@contextmanager
+def _map_context(numcores):
+    if numcores is not None and numcores > 1:
+        try:
+            import multiprocessing
+            p = multiprocessing.Pool(processes=numcores)
+            map = p.map
+            parallel = True
+        except ImportError:
+            warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
+            parallel = False
+    else:
+        parallel = False
+
+    try:
+        yield map
+    finally:
+        if parallel:
+            p.close()
