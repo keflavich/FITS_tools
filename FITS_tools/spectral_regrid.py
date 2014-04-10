@@ -8,21 +8,22 @@ def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
 
     wcs1 = WCS(header1)
     wcs2 = WCS(header2)
-    specaxis1 = wcs1.wcs.spec
-    specaxis2 = wcs2.wcs.spec
-    try:
-        from specutils.io import fits as spfits
-        h1 = spfits.FITSWCSSpectrum(header1)
-        h2 = spfits.FITSWCSSpectrum(header2)
-        w1 = spfits.read_fits_wcs_linear1d(h1,spectral_axis=specaxis1)
-        w2 = spfits.read_fits_wcs_linear1d(h2,spectral_axis=specaxis2)
-    except ImportError:
-        def w1(x, coords=list(wcs1.wcs.crpix)):
-            coords[specaxis1] = x+1
-            return wcs1.wcs_pix2world([coords],1)[0][-1]
-        def w2(x, coords=list(wcs2.wcs.crpix)):
-            coords[specaxis2] = x+1
-            return wcs2.wcs_pix2world([coords],1)[0][-1]
+    if specaxis1 is None:
+        specaxis1 = wcs1.wcs.spec
+    if specaxis2 is None:
+        specaxis2 = wcs2.wcs.spec
+
+    # Functions to give the spectral coordinate from each FITS header
+    def w1(x):
+        coords=list(wcs1.wcs.crpix)
+        coords[specaxis1] = x+1
+        coords = list(np.broadcast(*coords))
+        return wcs1.wcs_pix2world(coords,1)[:,specaxis1]
+    def w2(x):
+        coords=list(wcs2.wcs.crpix)
+        coords[specaxis2] = x+1
+        coords = list(np.broadcast(*coords))
+        return wcs2.wcs_pix2world([coords],1)[:,specaxis2]
 
     # specaxis2 indexed from 0, naxis indexed from 1
     outshape = header2['NAXIS%i' % (specaxis2+1)]
