@@ -1,3 +1,4 @@
+from astropy import units as u
 import numpy as np
 from astropy.wcs import WCS
 
@@ -13,17 +14,20 @@ def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
     if specaxis2 is None:
         specaxis2 = wcs2.wcs.spec
 
+    u1 = u.Unit(header1['CUNIT%i' % (specaxis1+1)])
+    u2 = u.Unit(header2['CUNIT%i' % (specaxis2+1)])
+
     # Functions to give the spectral coordinate from each FITS header
     def w1(x):
         coords=list(wcs1.wcs.crpix)
         coords[specaxis1] = x+1
         coords = list(np.broadcast(*coords))
-        return wcs1.wcs_pix2world(coords,1)[:,specaxis1]
+        return wcs1.wcs_pix2world(coords,1)[:,specaxis1]*u1
     def w2(x):
         coords=list(wcs2.wcs.crpix)
         coords[specaxis2] = x+1
         coords = list(np.broadcast(*coords))
-        return wcs2.wcs_pix2world([coords],1)[:,specaxis2]
+        return wcs2.wcs_pix2world(coords,1)[:,specaxis2]*u2
 
     # specaxis2 indexed from 0, naxis indexed from 1
     outshape = header2['NAXIS%i' % (specaxis2+1)]
