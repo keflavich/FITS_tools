@@ -13,6 +13,32 @@ import itertools
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
+    """
+    Regrid a FITS file to a target header.
+    Requires that the FITS file and the target header have spectral and spatial
+    overlap.
+    See `regrid_cube_hdu` and `regrid_cube` for additional details or
+    alternative input options.
+
+    Parameters
+    ----------
+    cubefilename: str
+        FITS file name containing the cube to be reprojected
+    outheader: fits.Header
+        A target Header to project to
+    hdu: int
+        The hdu to project to the target header
+    outfilename: str
+        The output filename to save to
+    clobber: bool
+        Overwrite the output file if it exists?
+    kwargs: dict
+        Passed to `regrid_cube_hdu`
+
+    Returns
+    -------
+    Regridded HDU
+    """
     cube_hdu = fits.open(cubefilename)[hdu]
     rgcube = regrid_cube_hdu(cube_hdu, outheader)
 
@@ -22,7 +48,30 @@ def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
     return rgcube
 
 def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
+    """
+    Regrid a FITS HDU to a target header.
+    Requires that the FITS object and the target header have spectral and
+    spatial overlap.
+    See `regrid_cube` for additional details or
+    alternative input options.
+
+    Parameters
+    ----------
+    hdu: fits.PrimaryHDU
+        FITS HDU (not HDUlist) containing the cube to be reprojected
+    outheader: fits.Header
+        A target Header to project to
+    smooth: bool
+        Smooth the HDUs to match resolution?
+        Kernel size is determined using `smoothing_kernel_size`
+        .. WARNING:: Smoothing is done in 3D to be maximally general.
+                     This can be exceedingly slow!
+
+    Returns
+    -------
+    Regridded HDU
     outheader = load_header(outheader)
+    """
 
     if smooth:
         kw = smoothing_kernel_size(hdu.header, outheader)
