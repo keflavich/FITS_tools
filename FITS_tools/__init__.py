@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from cube_regrid import regrid_fits_cube,regrid_cube_hdu,regrid_cube
+import header_tools
 
 #this indicates whether or not we are in the package's setup.py
 try:
