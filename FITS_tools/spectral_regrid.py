@@ -2,6 +2,22 @@ from astropy import units as u
 import numpy as np
 from astropy.wcs import WCS
 
+def spec_pix_to_world(pixel, wcs, axisnumber, unit=None):
+    coords = list(wcs.wcs.crpix)
+    coords[axisnumber] = pixel+1
+    coords = list(np.broadcast(*coords))
+    if unit is None:
+        return wcs.wcs_pix2world(coords,1)[:,axisnumber]
+    else:
+        return wcs.wcs_pix2world(coords,1)[:,axisnumber]*unit
+
+def spec_world_to_pix(worldunit, wcs, axisnumber, unit):
+    coords = list(wcs.wcs.crpix)
+    coords[axisnumber] = worldunit.to(unit).value
+    coords = list(np.broadcast(*coords))
+    return wcs.wcs_world2pix(coords,0)[:,axisnumber]
+
+
 def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
     """
     Determine the mapping from header1 pixel units to header2 pixel units
@@ -18,16 +34,8 @@ def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
     u2 = u.Unit(header2['CUNIT%i' % (specaxis2+1)])
 
     # Functions to give the spectral coordinate from each FITS header
-    def w1(x):
-        coords=list(wcs1.wcs.crpix)
-        coords[specaxis1] = x+1
-        coords = list(np.broadcast(*coords))
-        return wcs1.wcs_pix2world(coords,1)[:,specaxis1]*u1
-    def w2(x):
-        coords=list(wcs2.wcs.crpix)
-        coords[specaxis2] = x+1
-        coords = list(np.broadcast(*coords))
-        return wcs2.wcs_pix2world(coords,1)[:,specaxis2]*u2
+    w1 = lambda x: spec_pix_to_world(x, wcs1, specaxis1, unit=u1)
+    w2 = lambda x: spec_pix_to_world(x, wcs2, specaxis2, unit=u2)
 
     # specaxis2 indexed from 0, naxis indexed from 1
     outshape = header2['NAXIS%i' % (specaxis2+1)]
