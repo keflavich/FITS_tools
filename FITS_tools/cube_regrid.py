@@ -10,6 +10,8 @@ from astropy import wcs
 import warnings
 from astropy.convolution import Gaussian2DKernel,Gaussian1DKernel
 import itertools
+from .downsample import downsample_axis
+import copy
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
@@ -328,7 +330,29 @@ def spectral_smooth_cube(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
 
     return smoothcube
 
+def downsample_cube(cubehdu, factor, spectralaxis=0):
+
+    avg = downsample_axis(cubehdu.data, factor, axis=spectralaxis)
+    
+    header = copy.copy(cubehdu.header)
+
+    whdr = wcs.WCS(header)
+    whdr.wcs.cdelt[whdr.wcs.spec] *= factor
+    crpix = whdr.wcs.crpix[whdr.wcs.spec]
+
+    scalefactor = 1./factor
+    crpix_new = (crpix-1)*scalefactor+0.5+scalefactor/2.
+    whdr.wcs.crpix[whdr.wcs.spec] = crpix_new
+
+    header.update(whdr.to_header())
+
+    hdu = fits.PrimaryHDU(data=avg, header=header)
+
+    return hdu
+
+
 from contextlib import contextmanager
+import __builtin__
 
 @contextmanager
 def _map_context(numcores):
@@ -339,10 +363,12 @@ def _map_context(numcores):
             map = p.map
             parallel = True
         except ImportError:
+            map = __builtin__.map
             warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
             parallel = False
     else:
         parallel = False
+        map = __builtin__.map
 
     try:
         yield map
