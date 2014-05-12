@@ -67,6 +67,12 @@ try:
                 wcs = pywcs.WCS(header)
             except:
                 raise TypeError("header must either be a pyfits.Header or pywcs.WCS instance")
+
+            if not hasattr(wcs,'naxis1'):
+                wcs.naxis1 = header['NAXIS1']
+            if not hasattr(wcs,'naxis2'):
+                wcs.naxis2 = header['NAXIS2']
+
         return wcs
 
     def _check_header_matches_image(image, header):
