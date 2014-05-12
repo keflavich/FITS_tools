@@ -30,9 +30,6 @@ def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
     if specaxis2 is None:
         specaxis2 = wcs2.wcs.spec
 
-    u1 = u.Unit(header1['CUNIT%i' % (specaxis1+1)])
-    u2 = u.Unit(header2['CUNIT%i' % (specaxis2+1)])
-
     # Functions to give the spectral coordinate from each FITS header
     w1 = lambda x: spec_pix_to_world(x, wcs1, specaxis1, unit=wcs1.wcs.cunit[specaxis1])
     w2 = lambda x: spec_pix_to_world(x, wcs2, specaxis2, unit=wcs1.wcs.cunit[specaxis2])
