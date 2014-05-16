@@ -100,7 +100,7 @@ setup(name=PACKAGENAME,
       description=DESCRIPTION,
       scripts=scripts,
       requires=['astropy','scipy'],
-      install_requires=['astropy','scipy'],
+      install_requires=['astropy'],
       provides=[PACKAGENAME],
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
@@ -111,4 +111,4 @@ setup(name=PACKAGENAME,
       zip_safe=False,
       use_2to3=True,
       **package_info
-)
+      )
