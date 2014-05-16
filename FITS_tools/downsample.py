@@ -57,3 +57,6 @@ try:
 except AttributeError:
     import warnings
     warnings.warn("Numpy doesn't have a nanmean attribute; a more recent version of numpy is required.")
+
+    def downsample_axis(*args, **kwargs):
+        raise AttributeError("This version of numpy doesn't possess a nanmean.")
