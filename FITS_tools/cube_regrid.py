@@ -14,7 +14,7 @@ from .downsample import downsample_axis
 from .spectral_regrid import get_spectral_mapping
 from .hcongrid import get_pixel_mapping
 from .strip_headers import flatten_header
-from .load_header import get_cd
+from .load_header import load_header,get_cd
 
 spectral_smooth_cube__all__ = ["downsample_cube", "get_cube_mapping",
                                "gsmooth_cube", "regrid_cube",
@@ -25,30 +25,31 @@ spectral_smooth_cube__all__ = ["downsample_cube", "get_cube_mapping",
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
     """
-    Regrid a FITS file to a target header.
-    Requires that the FITS file and the target header have spectral and spatial
-    overlap.
+    Regrid a FITS file to a target header.  Requires that the FITS file and the
+    target header have spectral and spatial overlap.
+
     See `regrid_cube_hdu` and `regrid_cube` for additional details or
     alternative input options.
 
     Parameters
     ----------
-    cubefilename: str
+    cubefilename : str
         FITS file name containing the cube to be reprojected
-    outheader: fits.Header
+    outheader : `~astropy.io.fits.Header`
         A target Header to project to
-    hdu: int
+    hdu : int
         The hdu to project to the target header
-    outfilename: str
+    outfilename : str
         The output filename to save to
-    clobber: bool
+    clobber : bool
         Overwrite the output file if it exists?
-    kwargs: dict
-        Passed to `regrid_cube_hdu`
+    kwargs : dict
+        Passed to `~FITS_tools.cube_regrid.regrid_cube_hdu`
 
     Returns
     -------
-    Regridded HDU
+    rgcube : `~astropy.io.fits.PrimaryHDU`
+        The regridded cube
     """
     cube_hdu = fits.open(cubefilename)[hdu]
     rgcube = regrid_cube_hdu(cube_hdu, outheader)
@@ -60,29 +61,29 @@ def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
 
 def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
     """
-    Regrid a FITS HDU to a target header.
-    Requires that the FITS object and the target header have spectral and
-    spatial overlap.
-    See `regrid_cube` for additional details or
-    alternative input options.
+    Regrid a FITS HDU to a target header.  Requires that the FITS object and
+    the target header have spectral and spatial overlap.  See `~regrid_cube` for
+    additional details or alternative input options.
 
     Parameters
     ----------
-    hdu: fits.PrimaryHDU
+    hdu : `~astropy.io.fits.PrimaryHDU`
         FITS HDU (not HDUlist) containing the cube to be reprojected
-    outheader: fits.Header
+    outheader : `~astropy.io.fits.Header`
         A target Header to project to
-    smooth: bool
+    smooth : bool
         Smooth the HDUs to match resolution?
         Kernel size is determined using `smoothing_kernel_size`
+
         .. WARNING:: Smoothing is done in 3D to be maximally general.
                      This can be exceedingly slow!
 
     Returns
     -------
     Regridded HDU
-    outheader = load_header(outheader)
     """
+
+    outheader = load_header(outheader)
 
     if smooth:
         kw = smoothing_kernel_size(hdu.header, outheader)
@@ -96,25 +97,25 @@ def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
 
 def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **kwargs):
     """
-    Attempt to reproject a cube onto another cube's header.
-    Uses interpolation via scipy.ndimage.map_coordinates
+    Attempt to reproject a cube onto another cube's header.  Uses interpolation
+    via `~scipy.ndimage.interpolation.map_coordinates`
 
     Assumptions:
     
      * Both the cube and the target are 3-dimensional, with lon/lat/spectral axes
      * Both cube and header use CD/CDELT rather than PC
 
-    kwargs will be passed to `scipy.ndimage.map_coordinates`
+    ``kwargs`` will be passed to `~scipy.ndimage.interpolation.map_coordinates`
 
     Parameters
     ----------
-    cubedata : ndarray
+    cubedata : `~numpy.ndarray`
         A three-dimensional data cube
-    cubeheader : `pyfits.Header` or `pywcs.WCS`
+    cubeheader : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
         The header or WCS corresponding to the image
-    targetheader : `pyfits.Header` or `pywcs.WCS`
+    targetheader : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
         The header or WCS to interpolate onto
-    preserve_bad_pixels: bool
+    preserve_bad_pixels : bool
         Try to set NAN pixels to NAN in the zoomed image.  Otherwise, bad
         pixels will be set to zero
     """
@@ -143,7 +144,7 @@ def get_cube_mapping(header1, header2):
     """
     Determine the pixel mapping from Header 1 to Header 2
 
-    Assumptions are spelled out in regrid_cube
+    Assumptions are spelled out in `~regrid_cube`
     """
     specgrid = get_spectral_mapping(header1,header2,specaxis1=2,specaxis2=2)
     # pixgrid is returned in the order y,x, which is correct for np array indexing
@@ -231,22 +232,22 @@ def spatial_smooth_cube(cube, kernelwidth, kernel=Gaussian2DKernel, cubedim=0,
 
     Parameters
     ----------
-    cube: np.ndarray
+    cube : `~numpy.ndarray`
         A data cube, with ndim=3
-    kernelwidth: float
+    kernelwidth : float
         Width of the kernel.  Defaults to Gaussian.
-    kernel: astropy.convolution.Kernel2D
+    kernel : `~astropy.convolution.Kernel2D`
         A 2D kernel from astropy
-    cubedim: int
+    cubedim : int
         The axis to map across.  If you have a normal FITS data cube with
         AXIS1=RA, AXIS2=Dec, and AXIS3=wavelength, for example, cubedim is 0
         (because axis3 -> 0, axis2 -> 1, axis1 -> 2)
-    numcores: int
+    numcores : int
         Number of cores to use in parallel-processing.
-    use_fft: bool
-        Use convolve_fft or convolve?
-    kwargs: dict
-        Passed to astropy.convolution.convolve
+    use_fft : bool
+        Use `astropy.convolution.convolve_fft` or `astropy.convolution.convolve`?
+    kwargs : dict
+        Passed to `~astropy.convolution.convolve`
     """
         
     if cubedim != 0:
@@ -291,21 +292,21 @@ def spectral_smooth_cube(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
 
     Parameters
     ----------
-    cube: np.ndarray
+    cube : `~numpy.ndarray`
         A data cube, with ndim=3
-    kernelwidth: float
+    kernelwidth : float
         Width of the kernel.  Defaults to Gaussian.
-    kernel: astropy.convolution.Kernel1D
+    kernel : `~astropy.convolution.Kernel1D`
         A 1D kernel from astropy
-    cubedim: int
+    cubedim : int
         The axis *NOT* to map across, i.e. the spectral axis.  If you have a
         normal FITS data cube with AXIS1=RA, AXIS2=Dec, and AXIS3=wavelength,
         for example, cubedim is 0 (because axis3 -> 0, axis2 -> 1, axis1 -> 2)
-    numcores: int
+    numcores : int
         Number of cores to use in parallel-processing.
-    use_fft: bool
+    use_fft : bool
         Use convolve_fft or convolve?
-    kwargs: dict
+    kwargs : dict
         Passed to astropy.convolution.convolve
     """
 
@@ -345,7 +346,7 @@ def downsample_cube(cubehdu, factor, spectralaxis=None):
 
     Parameters
     ----------
-    cubehdu : fits.PrimaryHDU
+    cubehdu : `~astropy.io.fits.PrimaryHDU`
         The cube to downsample
     factor : int
         The factor by which the cube should be downsampled

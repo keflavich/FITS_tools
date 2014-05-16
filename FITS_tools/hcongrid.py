@@ -11,12 +11,12 @@ try:
         """
         Interpolate an image from one FITS header onto another
 
-        kwargs will be passed to `scipy.ndimage.map_coordinates`
+        kwargs will be passed to `~scipy.ndimage.interpolation.map_coordinates`
 
         Parameters
         ----------
         image : ndarray
-            A two-dimensional image 
+            A two-dimensional image
         header1 : `pyfits.Header` or `pywcs.WCS`
             The header or WCS corresponding to the image
         header2 : `pyfits.Header` or `pywcs.WCS`
@@ -166,7 +166,7 @@ try:
 
     def zoom_fits(fitsfile, scalefactor, preserve_bad_pixels=True, **kwargs):
         """
-        Zoom in on a FITS image by interpolating using scipy.ndimage.zoom
+        Zoom in on a FITS image by interpolating using `~scipy.ndimage.interpolation.zoom`
 
         Parameters
         ----------

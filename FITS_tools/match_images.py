@@ -11,7 +11,7 @@ def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
     """
     Light wrapper of montage with hcongrid as a backup
 
-    kwargs will be passed to hcongrid if `use_montage==False`
+    kwargs will be passed to `~hcongrid.hcongrid` if ``use_montage==False``
 
     Parameters
     ----------
@@ -20,13 +20,13 @@ def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
         header : pyfits.Header
             A pyfits Header instance with valid WCS to project to
         use_montage : bool
-            Use montage or hcongrid (scipy's map_coordinates)
+            Use montage or hcongrid (based on `~scipy.ndimage.interpolation.map_coordinates`)
         quiet : bool
             Silence Montage's output
 
     Returns
     -------
-        np.ndarray image projected to header's coordinates
+    np.ndarray image projected to header's coordinates
 
     """
     try:
@@ -82,7 +82,7 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
 
     Returns
     -------
-    image1,image2,[header] : 
+    image1,image2,[header] :
         Two images projected into the same space, and optionally
         the header used to project them
     """
