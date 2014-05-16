@@ -2,6 +2,8 @@
 FITS Tools
 ==========
 
+`Documentation is hosted at readthedocs <http://fits-tools.readthedocs.org/en/latest/>`_
+
 Quick Install Instructions
 --------------------------
 
