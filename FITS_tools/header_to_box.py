@@ -18,4 +18,4 @@ def header_to_box(header):
     return xcenter,ycenter,height,width
 
 def box_to_header(xcenter,ycenter,height,width,cd1,cd2):
-    pass
+    raise NotImplementedError

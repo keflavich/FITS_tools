@@ -3,6 +3,12 @@ import numpy as np
 from astropy.wcs import WCS
 
 def spec_pix_to_world(pixel, wcs, axisnumber, unit=None):
+    """
+    Given a WCS, an axis ID, and a pixel ID, return the WCS spectral value at a
+    pixel location
+    
+    .. TODO:: refactor to use wcs.sub
+    """
     coords = list(wcs.wcs.crpix)
     coords[axisnumber] = pixel+1
     coords = list(np.broadcast(*coords))
@@ -12,6 +18,12 @@ def spec_pix_to_world(pixel, wcs, axisnumber, unit=None):
         return wcs.wcs_pix2world(coords,1)[:,axisnumber]*unit
 
 def spec_world_to_pix(worldunit, wcs, axisnumber, unit):
+    """
+    Given a WCS, an axis ID, and WCS location, return the pixel index value at a
+    pixel location
+    
+    .. TODO:: refactor to use wcs.sub
+    """
     coords = list(wcs.wcs.crpix)
     coords[axisnumber] = worldunit.to(unit).value
     coords = list(np.broadcast(*coords))
@@ -20,7 +32,8 @@ def spec_world_to_pix(worldunit, wcs, axisnumber, unit):
 
 def get_spectral_mapping(header1, header2, specaxis1=None, specaxis2=None):
     """
-    Determine the mapping from header1 pixel units to header2 pixel units
+    Determine the mapping from header1 pixel units to header2 pixel units along
+    their respective spectral axes
     """
 
     wcs1 = WCS(header1)

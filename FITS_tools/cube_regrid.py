@@ -13,6 +13,12 @@ import itertools
 from .downsample import downsample_axis
 import copy
 
+spectral_smooth_cube__all__ = ["downsample_cube", "get_cube_mapping",
+                               "gsmooth_cube", "regrid_cube",
+                               "regrid_cube_hdu", "regrid_fits_cube",
+                               "smoothing_kernel_size", "spatial_smooth_cube",
+                               ]
+
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
     """
