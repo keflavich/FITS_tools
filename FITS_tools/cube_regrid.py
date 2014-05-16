@@ -339,19 +339,36 @@ def spectral_smooth_cube(cube, kernelwidth, kernel=Gaussian1DKernel, cubedim=0,
 
     return smoothcube
 
-def downsample_cube(cubehdu, factor, spectralaxis=0):
+def downsample_cube(cubehdu, factor, spectralaxis=None):
+    """
+    Downsample a cube along the spectral axis
 
-    avg = downsample_axis(cubehdu.data, factor, axis=spectralaxis)
+    Parameters
+    ----------
+    cubehdu : fits.PrimaryHDU
+        The cube to downsample
+    factor : int
+        The factor by which the cube should be downsampled
+    spectralaxis : int
+        The 0-indexed ID fo the spectral axis.  Will be determined
+        automatically if not specified
+    """
+
     
     header = copy.copy(cubehdu.header)
 
     whdr = wcs.WCS(header)
-    whdr.wcs.cdelt[whdr.wcs.spec] *= factor
-    crpix = whdr.wcs.crpix[whdr.wcs.spec]
+    if spectralaxis is None:
+        spectralaxis = whdr.wcs.spec
+
+    avg = downsample_axis(cubehdu.data, factor, axis=spectralaxis)
+
+    whdr.wcs.cdelt[spectralaxis] *= factor
+    crpix = whdr.wcs.crpix[spectralaxis]
 
     scalefactor = 1./factor
     crpix_new = (crpix-1)*scalefactor+0.5+scalefactor/2.
-    whdr.wcs.crpix[whdr.wcs.spec] = crpix_new
+    whdr.wcs.crpix[spectralaxis] = crpix_new
 
     header.update(whdr.to_header())
 
