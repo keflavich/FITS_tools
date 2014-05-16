@@ -66,9 +66,9 @@ def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
 def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
         return_header=False, **kwargs):
     """
-    Project one FITS file into another's coordinates
-    If sigma_cut is used, will try to find only regions that are significant
-    in both images using the standard deviation
+    Project one FITS file into another's coordinates.  If ``sigma_cut`` is
+    used, will try to find only regions that are significant in both images
+    using the standard deviation, masking out other signal
 
     Parameters
     ----------
@@ -103,7 +103,7 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     if sigma_cut:
         corr_image1 = image1*(image1 > image1.std()*sigma_cut)
         corr_image2 = image2_projected*(image2_projected > image2_projected.std()*sigma_cut)
-        OK = (corr_image1==corr_image1)*(corr_image2==corr_image2) 
+        OK = (corr_image1==corr_image1)*(corr_image2==corr_image2)
         if (corr_image1[OK]*corr_image2[OK]).sum() == 0:
             print "Could not use sigma_cut of %f because it excluded all valid data" % sigma_cut
             corr_image1 = image1

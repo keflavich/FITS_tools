@@ -5,14 +5,14 @@ from astropy.wcs import WCSSUB_CELESTIAL
 
 def header_to_platescale(header):
     """
-    Attempt to determine the spatial platescale from a fits Header
+    Attempt to determine the spatial platescale from a `~astropy.io.fits.Header`
     """
     w = wcs.WCS(header)
     return wcs_to_platescale(w.wcs)
 
 def wcs_to_platescale(mywcs, assert_square=True, use_units=False):
     """
-    Attempt to determine the spatial plate scale from a WCS instance
+    Attempt to determine the spatial plate scale from a `~astropy.wcs.WCS`
     """
 
     # Code adapted from APLpy
