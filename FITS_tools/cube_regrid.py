@@ -1,17 +1,20 @@
 import numpy as np
 import scipy.ndimage
-from .spectral_regrid import get_spectral_mapping
-from .hcongrid import get_pixel_mapping
-from .strip_headers import flatten_header
-from .load_header import load_header,get_cd
 from astropy.io import fits
 from astropy.convolution import convolve,convolve_fft
 from astropy import wcs
 import warnings
 from astropy.convolution import Gaussian2DKernel,Gaussian1DKernel
 import itertools
-from .downsample import downsample_axis
 import copy
+from contextlib import contextmanager
+import __builtin__
+
+from .downsample import downsample_axis
+from .spectral_regrid import get_spectral_mapping
+from .hcongrid import get_pixel_mapping
+from .strip_headers import flatten_header
+from .load_header import get_cd
 
 spectral_smooth_cube__all__ = ["downsample_cube", "get_cube_mapping",
                                "gsmooth_cube", "regrid_cube",
@@ -356,9 +359,6 @@ def downsample_cube(cubehdu, factor, spectralaxis=0):
 
     return hdu
 
-
-from contextlib import contextmanager
-import __builtin__
 
 @contextmanager
 def _map_context(numcores):
