@@ -43,6 +43,7 @@ exclude_patterns.append('_templates')
 rst_epilog += """
 """
 
+intersphinx_mapping['astropy'] = ('http://docs.astropy.org/en/latest/', None)
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -70,6 +71,11 @@ release = FITS_tools.__version__
 # variables set in the global configuration. The variables set in the
 # global configuration are listed below, commented out.
 
+html_theme_options = {
+    'logotext1': 'FITS',  # white,  semi-bold
+    'logotext2': 'tools',  # orange, light
+    'logotext3': ':docs'   # white,  light
+    }
 # Add any paths that contain custom themes here, relative to this directory.
 # To use a different custom theme, add the directory containing the theme.
 #html_theme_path = []
@@ -117,7 +123,7 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 
 ## -- Options for the edit_on_github extension ----------------------------------------
 #
-#extensions += ['astropy.sphinx.ext.edit_on_github']
+extensions += ['astropy.sphinx.ext.edit_on_github']
 #
 ## Don't import the module as "version" or it will override the
 ## "version" configuration parameter
