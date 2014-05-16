@@ -19,3 +19,12 @@ Reference/API
 
 .. automodapi:: FITS_tools.match_images
     :no-inheritance-diagram:
+
+.. automodapi:: FITS_tools.strip_headers
+    :no-inheritance-diagram:
+
+.. automodapi:: FITS_tools.load_header
+    :no-inheritance-diagram:
+
+.. automodapi:: FITS_tools.header_tools
+    :no-inheritance-diagram:

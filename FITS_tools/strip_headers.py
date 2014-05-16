@@ -5,7 +5,7 @@ def flatten_header(header,delete=False):
     Attempt to turn an N-dimensional fits header into a 2-dimensional header
     Turns all CRPIX[>2] etc. into new keywords with prefix 'A'
 
-    header must be a pyfits.Header instance
+    header must be a `~astropy.io.fits.Header` instance
     """
 
     # TODO: Determine bad axes by examining CTYPE and excise them

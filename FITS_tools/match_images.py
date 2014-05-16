@@ -15,18 +15,19 @@ def project_to_header(fitsfile, header, use_montage=True, quiet=True, **kwargs):
 
     Parameters
     ----------
-        fitsfile : string
-            a FITS file name
-        header : pyfits.Header
-            A pyfits Header instance with valid WCS to project to
-        use_montage : bool
-            Use montage or hcongrid (based on `~scipy.ndimage.interpolation.map_coordinates`)
-        quiet : bool
-            Silence Montage's output
+    fitsfile : string
+        a FITS file name
+    header : `~astropy.io.fits.Header`
+        A pyfits Header instance with valid WCS to project to
+    use_montage : bool
+        Use montage or hcongrid (based on `~scipy.ndimage.interpolation.map_coordinates`)
+    quiet : bool
+        Silence Montage's output
 
     Returns
     -------
-    np.ndarray image projected to header's coordinates
+    image : `~numpy.ndarray`
+        image projected to header's coordinates
 
     """
     try:
@@ -71,18 +72,18 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
 
     Parameters
     ----------
-    fitsfile1: str
+    fitsfile1 : str
         Reference fits file name
-    fitsfile2: str
+    fitsfile2 : str
         Offset fits file name
-    header: pyfits.Header
+    header : `~astropy.io.fits.Header`
         Optional - can pass a header to projet both images to
-    sigma_cut: bool or int
+    sigma_cut : bool or int
         Perform a sigma-cut on the returned images at this level
 
     Returns
     -------
-    image1,image2,[header] :
+    image1,image2,[header] : `~numpy.ndarray`, `~numpy.ndarray`, `~astropy.io.fits.Header`
         Two images projected into the same space, and optionally
         the header used to project them
     """
