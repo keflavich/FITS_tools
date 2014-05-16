@@ -136,7 +136,7 @@ try:
             # system of the input image
             C2 = csys2(lon2,lat2,unit=(u.deg,u.deg))
             C1 = C2.transform_to(csys1)
-            lon2,lat2 = C1.lonangle.deg,C1.latangle.deg
+            lon2,lat2 = C1.spherical.lon.deg,C1.spherical.lat.deg
 
         xx1,yy1 = wcs1.wcs_world2pix(lon2, lat2, 0)
         grid = np.array([yy1.reshape(outshape),xx1.reshape(outshape)])
