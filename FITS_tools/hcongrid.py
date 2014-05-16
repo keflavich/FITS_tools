@@ -15,19 +15,20 @@ try:
 
         Parameters
         ----------
-        image : ndarray
+        image : `~numpy.ndarray`
             A two-dimensional image
-        header1 : `pyfits.Header` or `pywcs.WCS`
+        header1 : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
             The header or WCS corresponding to the image
-        header2 : `pyfits.Header` or `pywcs.WCS`
+        header2 : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
             The header or WCS to interpolate onto
-        preserve_bad_pixels: bool
+        preserve_bad_pixels : bool
             Try to set NAN pixels to NAN in the zoomed image.  Otherwise, bad
             pixels will be set to zero
 
         Returns
         -------
-        ndarray with shape defined by header2's naxis1/naxis2
+        newimage : `~numpy.ndarray`
+            ndarray with shape defined by header2's naxis1/naxis2
 
         Raises
         ------
@@ -91,15 +92,16 @@ try:
 
         Parameters
         ----------
-        header1 : `pyfits.Header` or `pywcs.WCS`
+        header1 : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
             The header or WCS corresponding to the image to be transformed
-        header2 : `pyfits.Header` or `pywcs.WCS`
+        header2 : `~astropy.io.fits.Header` or `~astropy.wcs.WCS`
             The header or WCS to interpolate onto
 
         Returns
         -------
-        ndarray describing a grid of y,x pixel locations in the input header's
-        pixel units but the output header's world units
+        grid : `~numpy.ndarray`
+            ndarray describing a grid of y,x pixel locations in the input
+            header's pixel units but the output header's world units
 
         Raises
         ------
@@ -158,6 +160,8 @@ try:
     def hcongrid_hdu(hdu_in, header, **kwargs):
         """
         Wrapper of hcongrid to work on HDUs
+
+        See `hcongrid` for details
         """
 
         reproj_image = hcongrid(hdu_in.data, hdu_in.header, header, **kwargs)
@@ -170,11 +174,11 @@ try:
 
         Parameters
         ----------
-        fitsfile: str
+        fitsfile : str
             FITS file name
-        scalefactor: float
+        scalefactor : float
             Zoom factor along all axes
-        preserve_bad_pixels: bool
+        preserve_bad_pixels : bool
             Try to set NAN pixels to NAN in the zoomed image.  Otherwise, bad
             pixels will be set to zero
         """
@@ -221,14 +225,14 @@ def wcsalign(hdu_in, header, outname=None, clobber=False):
 
     Parameters
     ----------
-    hdu_in: fits.PrimaryHDU
+    hdu_in : `~astropy.io.fits.PrimaryHDU`
         The HDU to reproject (must have header & data)
-    header: fits.Header
+    header : `~astropy.io.fits.Header`
         The target header to project to
-    outname: str (optional)
+    outname : str (optional)
         The filename to write to.
-    clobber: bool
-        Overwrite the file `outname` if it exists
+    clobber : bool
+        Overwrite the file ``outname`` if it exists
 
     Returns
     -------

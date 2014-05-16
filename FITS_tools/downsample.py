@@ -7,10 +7,22 @@ def downsample_axis(myarr, factor, axis, estimator=np.nanmean, truncate=False):
 
     This code is pure np and should be fast.
 
-    keywords:
-        estimator - default to mean.  You can downsample by summing or
-            something else if you want a different estimator
-            (e.g., downsampling error: you want to sum & divide by sqrt(n))
+    Parameters
+    ----------
+    myarr : `~numpy.ndarray`
+        The array to downsample
+    factor : int
+        The factor to downsample by
+    axis : int
+        The axis to downsample along
+    estimator : function
+        defaults to mean.  You can downsample by summing or
+        something else if you want a different estimator
+        (e.g., downsampling error: you want to sum & divide by sqrt(n))
+    truncate : bool
+        Whether to truncate the last chunk or average over a smaller number.
+        e.g., if you downsample [1,2,3,4] by a factor of 3, you could get either
+        [2] or [2,4] if truncate is True or False, respectively.
     """
     # size of the dimension of interest
     xs = myarr.shape[axis]

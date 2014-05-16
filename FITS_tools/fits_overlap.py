@@ -30,12 +30,12 @@ def header_overlap(hdr1,hdr2,max_separation=180,overlap="union"):
 
     Parameters
     ----------
-    hdr1,hdr2 : pyfits.Header
+    hdr1,hdr2 : `~astropy.io.fits.Header`
         Two pyfits headers to compare
     max_separation : int
         Maximum number of degrees between two headers to consider before flipping
         signs on one of them (this to deal with the longitude=0 region)
-    overlap: 'union' or 'intersection'
+    overlap : 'union' or 'intersection'
         Which merger to do
     """
     wcs1 = pywcs.WCS(hdr1)
