@@ -55,7 +55,9 @@ try:
         newimage = scipy.ndimage.map_coordinates(image, grid1, **kwargs)
 
         if preserve_bad_pixels:
-            newbad = scipy.ndimage.map_coordinates(bad_pixels, grid1, order=0, mode='constant', cval=np.nan)
+            newbad = scipy.ndimage.map_coordinates(bad_pixels, grid1, order=0,
+                                                   mode='constant',
+                                                   cval=np.nan)
             newimage[newbad] = np.nan
         
         return newimage
