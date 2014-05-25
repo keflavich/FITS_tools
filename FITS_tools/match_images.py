@@ -153,7 +153,7 @@ def match_fits_cubes(fitsfile1, fitsfile2, header=None, sigma_cut=False,
 
     See Also
     --------
-    `cube_regrid.regrid_fits_cube` performs a similar function and does the
+    The function :func:`~FITS_tools.cube_regrid.regrid_fits_cube` performs a similar function and does the
     underlying work, but it has a different call specification and returns an
     HDU
 
