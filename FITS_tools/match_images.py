@@ -86,6 +86,10 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     image1,image2,[header] : `~numpy.ndarray`, `~numpy.ndarray`, `~astropy.io.fits.Header`
         Two images projected into the same space, and optionally
         the header used to project them
+
+    See Also
+    --------
+    match_fits_cubes : this function, but for cubes
     """
 
     if header is None:
