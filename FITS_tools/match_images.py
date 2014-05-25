@@ -72,9 +72,9 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     Parameters
     ----------
     fitsfile1 : str
-        Reference fits file name
-    fitsfile2 : str
         Offset fits file name
+    fitsfile2 : str
+        Reference fits file name
     header : `~astropy.io.fits.Header`
         Optional - can pass a header that both input images will be projected
         to match
@@ -89,28 +89,28 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     """
 
     if header is None:
-        header = flatten_header(fits.getheader(fitsfile1))
-        image1 = fits.getdata(fitsfile1).squeeze()
+        header = flatten_header(fits.getheader(fitsfile2))
+        image2 = fits.getdata(fitsfile2).squeeze()
     else: # project image 1 to input header coordinates
-        image1 = project_to_header(fitsfile1, header, **kwargs)
+        image2 = project_to_header(fitsfile2, header, **kwargs)
 
-    # project image 2 to image 1 coordinates
-    image2_projected = project_to_header(fitsfile2, header, **kwargs)
+    # project image 1 to image 2 coordinates
+    image1_projected = project_to_header(fitsfile1, header, **kwargs)
 
     if image1.shape != image2_projected.shape:
         raise ValueError("Failed to reproject images to same shape.")
 
     if sigma_cut:
-        corr_image1 = image1*(image1 > image1.std()*sigma_cut)
-        corr_image2 = image2_projected*(image2_projected > image2_projected.std()*sigma_cut)
+        corr_image1 = image1_projected*(image1_projected > image1_projected.std()*sigma_cut)
+        corr_image2 = image2*(image2 > image2.std()*sigma_cut)
         OK = (corr_image1==corr_image1)*(corr_image2==corr_image2)
         if (corr_image1[OK]*corr_image2[OK]).sum() == 0:
             print "Could not use sigma_cut of %f because it excluded all valid data" % sigma_cut
-            corr_image1 = image1
-            corr_image2 = image2_projected
+            corr_image1 = image1_projected
+            corr_image2 = image2
     else:
-        corr_image1 = image1
-        corr_image2 = image2_projected
+        corr_image1 = image1_projected
+        corr_image2 = image2
 
     returns = corr_image1, corr_image2
     if return_header:
@@ -125,9 +125,9 @@ def match_fits_cubes(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     Parameters
     ----------
     fitsfile1 : str
-        Reference fits file name
+        FITS file name to reproject
     fitsfile2 : str
-        Offset fits file name
+        Reference FITS file name.  If ``header`` is specified, 
     smooth : bool
         Smooth the HDUs to match resolution?
         Kernel size is determined using `cube_regrid.smoothing_kernel_size`
@@ -153,9 +153,10 @@ def match_fits_cubes(fitsfile1, fitsfile2, header=None, sigma_cut=False,
 
     See Also
     --------
-    The function :func:`~FITS_tools.cube_regrid.regrid_fits_cube` performs a similar function and does the
-    underlying work, but it has a different call specification and returns an
-    HDU
+    cube_regrid.regrid_fits_cube : regrid a single cube
+        This function performs a similar purpose and does the underlying work
+        for `match_fits_cubes`, but it has a different call specification and
+        returns an HDU
 
     """
     
