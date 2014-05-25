@@ -181,8 +181,8 @@ def match_fits_cubes(fitsfile1, fitsfile2, header=None, sigma_cut=False,
                                      **kwargs).data
             header2 = header
 
-        else:
-            image2 = fits.getdata(fitsfile2)
+    else:
+        image2 = fits.getdata(fitsfile2)
 
     
     image1 = regrid_cube_hdu(hdu=fits.open(fitsfile1)[0],

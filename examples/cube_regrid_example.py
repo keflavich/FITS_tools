@@ -6,9 +6,12 @@ Regridding example:
 
     GRS data are available here: http://grunt.bu.edu/grs-stitch/source/
 """
-import FITS_tools
-from astropy import wcs
 import numpy as np
+
+from astropy import wcs
+from astropy.io import fits
+
+import FITS_tools
 
 outsize = [100,100,100]
 
@@ -40,3 +43,15 @@ im1, im2 = FITS_tools.match_images.match_fits_cubes('grs-48-cube.fits',
 
 # Merge the two:
 im_merged = im1 + im2
+
+hdu = fits.PrimaryHDU(data=im_merged, header=header)
+# The header is, unfortunately, created in the wrong order, and there's no
+# simple way around that.  astropy will fix the order if told, though
+hdu.writeto('grs-subcube-merged.fits', output_verify='fix')
+
+# Just to test that the image-to-image version works:
+im1b, im2b = FITS_tools.match_images.match_fits_cubes('grs-48-cube.fits',
+                                                      'grs-subcube-merged.fits')
+
+# This will raise an AssertionError if im1 and im1b are not identical
+np.testing.assert_array_almost_equal(im1, im1b)
