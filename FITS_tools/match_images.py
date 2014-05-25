@@ -175,20 +175,20 @@ def match_fits_cubes(fitsfile1, fitsfile2, header=None, sigma_cut=False,
             raise ValueError("Input header is not a cube header.")
 
         if wcs2 != wcs3:
-            image2 = cube_regrid.regrid_cube_hdu(hdu=fits.open(fitsfile1)[0],
-                                                 outheader=header,
-                                                 smooth=smooth,
-                                                 **kwargs).data
+            image2 = regrid_cube_hdu(hdu=fits.open(fitsfile2)[0],
+                                     outheader=header,
+                                     smooth=smooth,
+                                     **kwargs).data
             header2 = header
 
         else:
-            image2 = fits.getdata(fitsfile1)
+            image2 = fits.getdata(fitsfile2)
 
     
-    image1 = cube_regrid.regrid_cube_hdu(hdu=fits.open(fitsfile1)[0],
-                                         outheader=header2,
-                                         smooth=smooth,
-                                         **kwargs).data
+    image1 = regrid_cube_hdu(hdu=fits.open(fitsfile1)[0],
+                             outheader=header2,
+                             smooth=smooth,
+                             **kwargs).data
 
     if return_header:
         return image1,image2,header2

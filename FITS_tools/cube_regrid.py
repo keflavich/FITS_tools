@@ -358,20 +358,22 @@ def downsample_cube(cubehdu, factor, spectralaxis=None):
     
     header = copy.copy(cubehdu.header)
 
-    whdr = wcs.WCS(header)
+    mywcs = wcs.WCS(header)
     if spectralaxis is None:
-        spectralaxis = whdr.wcs.spec
+        spectralaxis = mywcs.wcs.spec
 
     avg = downsample_axis(cubehdu.data, factor, axis=spectralaxis)
 
-    whdr.wcs.cdelt[spectralaxis] *= factor
-    crpix = whdr.wcs.crpix[spectralaxis]
+    mywcs.wcs.cdelt[spectralaxis] *= factor
+    crpix = mywcs.wcs.crpix[spectralaxis]
 
     scalefactor = 1./factor
     crpix_new = (crpix-1)*scalefactor+0.5+scalefactor/2.
-    whdr.wcs.crpix[spectralaxis] = crpix_new
+    mywcs.wcs.crpix[spectralaxis] = crpix_new
 
-    header.update(whdr.to_header())
+    whdr = mywcs.to_header()
+    for key in whdr:
+        header[key] = whdr[key]
 
     hdu = fits.PrimaryHDU(data=avg, header=header)
 
