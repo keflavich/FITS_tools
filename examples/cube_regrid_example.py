@@ -7,11 +7,18 @@ Regridding example:
     GRS data are available here: http://grunt.bu.edu/grs-stitch/source/
 """
 import numpy as np
+import os
 
 from astropy import wcs
 from astropy.io import fits
 
 import FITS_tools
+
+if not os.path.exists('grs-48-cube.fits') and os.path.exists('grs-50-cube.fits'):
+    raise IOError("The data cubes don't exist.  Either copy them to the present "
+                  "directory or download them from http://grunt.bu.edu/grs-stitch/source/."
+                  "\nwget http://grunt.bu.edu/grs-stitch/source/grs-50-cube.fits"
+                  "\nwget http://grunt.bu.edu/grs-stitch/source/grs-48-cube.fits")
 
 outsize = [100,100,100]
 
