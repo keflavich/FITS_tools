@@ -9,6 +9,7 @@ import itertools
 import copy
 from contextlib import contextmanager
 import __builtin__
+from astropy import log
 
 from .downsample import downsample_axis
 from .spectral_regrid import get_spectral_mapping
@@ -95,7 +96,8 @@ def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
     newhdu = fits.PrimaryHDU(data=cubedata, header=outheader)
     return newhdu
 
-def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **kwargs):
+def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
+                order=1, **kwargs):
     """
     Attempt to reproject a cube onto another cube's header.  Uses interpolation
     via `~scipy.ndimage.interpolation.map_coordinates`
@@ -120,18 +122,35 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
         pixels will be set to zero
     """
 
-    grid = get_cube_mapping(cubeheader, targetheader)
-
-    bad_pixels = np.isnan(cubedata) + np.isinf(cubedata)
-
-    cubedata[bad_pixels] = 0
-
     if cubedata.ndim != 3:
         cubedata = cubedata.squeeze()
         if cubedata.ndim != 3:
             raise ValueError("Cube has %i dimensions, so it's not a cube." % cubedata.ndim)
 
-    newcubedata = scipy.ndimage.map_coordinates(cubedata, grid, **kwargs)
+    full_grid = get_cube_mapping(cubeheader, targetheader)
+    grid_limits = find_grid_limits(full_grid)
+    # subtract off the lower coordinate of each grid
+    grid = [g - m[0] for g,m in zip(full_grid, grid_limits)]
+
+    if grid[0].ndim != full_grid[0].ndim:
+        raise ValueError("Grid dropped a dimension.  This is not possible.")
+
+    limit_slice = [slice(m[0],m[1]+1) for m in grid_limits]
+    cubedata = cubedata[limit_slice]
+
+    bad_pixels = np.isnan(cubedata) + np.isinf(cubedata)
+
+    cubedata[bad_pixels] = 0
+
+    # There appears to be a bug in scipy that affects only large arrays:
+    # cubedata will be forcibly converted to float64 unless order == 1
+    # but maybe it has to be float64?
+    if order == 1:
+        newcubedata = scipy.ndimage.map_coordinates(cubedata.astype(np.float64),
+                                                    grid, order=order, **kwargs)
+    else:
+        newcubedata = scipy.ndimage.map_coordinates(cubedata, grid,
+                                                    order=order, **kwargs)
 
     if preserve_bad_pixels:
         newbad = scipy.ndimage.map_coordinates(bad_pixels, grid, order=0,
@@ -139,6 +158,15 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True, **
         newcubedata[newbad.astype('bool')] = np.nan
     
     return newcubedata
+
+def find_grid_limits(grid):
+    """
+    Determine the min/max of each dimension along a grid returned by
+    `get_cube_mapping`.  These parameters can be used to slice a cube prior to
+    passing it to, e.g., `scipy.ndimage.map_coordinates` to reduce the memory
+    use
+    """
+    return [(np.floor(g.min()),np.ceil(g.max())) for g in grid]
 
 def get_cube_mapping(header1, header2):
     """
