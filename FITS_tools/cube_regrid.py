@@ -166,7 +166,7 @@ def find_grid_limits(grid):
     passing it to, e.g., `scipy.ndimage.map_coordinates` to reduce the memory
     use
     """
-    return [(np.floor(g.min()),np.ceil(g.max())) for g in grid]
+    return [(np.floor(np.nanmin(g)),np.ceil(np.nanmax(g))) for g in grid]
 
 def get_cube_mapping(header1, header2):
     """
