@@ -97,7 +97,7 @@ def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
     return newhdu
 
 def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
-                order=1, **kwargs):
+                order=1, mode='constant', out_of_bounds=np.nan, **kwargs):
     """
     Attempt to reproject a cube onto another cube's header.  Uses interpolation
     via `~scipy.ndimage.interpolation.map_coordinates`
@@ -120,23 +120,38 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
     preserve_bad_pixels : bool
         Try to set NAN pixels to NAN in the zoomed image.  Otherwise, bad
         pixels will be set to zero
+    out_of_bounds : float or np.nan
+        Pixels in the output image that were out of bounds in the old image
+        will be set to this value *if* mode='constant'
+    mode : str
+        The mode of treatment of out-of-bounds pixels; can be 'constant',
+        'wrap', 'reflect', or 'nearest'.  See
+        `~scipy.ndimage.interpolation.map_coordinates` for details.
     """
 
     if cubedata.ndim != 3:
         cubedata = cubedata.squeeze()
         if cubedata.ndim != 3:
-            raise ValueError("Cube has %i dimensions, so it's not a cube." % cubedata.ndim)
+            raise ValueError("Dataset has %i dimensions, so it's not a cube." % cubedata.ndim)
 
     full_grid = get_cube_mapping(cubeheader, targetheader)
     grid_limits = find_grid_limits(full_grid)
-    # subtract off the lower coordinate of each grid
-    grid = [g - m[0] for g,m in zip(full_grid, grid_limits)]
+    # subtract off the lower coordinate of each grid:
+    # this is a performance optimization to only use a subset of the 
+    # cube if gridding a large cube onto a smaller space
+    # This is therefore done IF AND ONLY IF that coordinate is positive!
+    grid = [g - m[0] if m[0] > 0 else g
+            for g,m in zip(full_grid, grid_limits)]
 
     if grid[0].ndim != full_grid[0].ndim:
         raise ValueError("Grid dropped a dimension.  This is not possible.")
 
-    # Negative coordinates will truncate the cube inappropriately from the far side
-    limit_slice = [slice((m[0]) if m[0]>0 else 0, (m[1]+1)) for m in grid_limits]
+    # Truncate the input cube on both sides if the input cube is larger than
+    # the output grid.  If the input cube is smaller, m[1]+1 should be (at
+    # least) the "right side" of the frame and therefore all data should be
+    # included.  The +1 is because of python indexing conventions
+    limit_slice = [slice((m[0]) if m[0]>0 else 0, (m[1]+1))
+                   for m in grid_limits]
     cubedata = cubedata[limit_slice]
 
     bad_pixels = np.isnan(cubedata) + np.isinf(cubedata)
@@ -148,14 +163,19 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
     # but maybe it has to be float64?
     if order == 1:
         newcubedata = scipy.ndimage.map_coordinates(cubedata.astype(np.float64),
-                                                    grid, order=order, **kwargs)
+                                                    grid, order=order, mode=mode,
+                                                    cval=out_of_bounds, **kwargs)
     else:
         newcubedata = scipy.ndimage.map_coordinates(cubedata, grid,
-                                                    order=order, **kwargs)
+                                                    order=order, mode=mode,
+                                                    cval=out_of_bounds,
+                                                    **kwargs)
 
     if preserve_bad_pixels:
+        # Set any pixels that had a nearest-neighbor which was 'bad' and any
+        # out-of-bounds pixels to NaN
         newbad = scipy.ndimage.map_coordinates(bad_pixels, grid, order=0,
-                                               mode='constant', cval=np.nan)
+                                               mode='constant', cval=True)
         newcubedata[newbad.astype('bool')] = np.nan
     
     return newcubedata
