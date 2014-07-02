@@ -79,7 +79,7 @@ SPECSYS = 'LSRK'
 END
 """.strip().lstrip()
 
-from ..cube_regrid import regrid_cube,regrid_cube_hdu
+from ..cube_regrid import regrid_cube,regrid_cube_hdu,get_cube_mapping
 
 @pytest.mark.parametrize(('h1','h2'),zip((header1,header2,header3),(header2,header3,header1)))
 def test_wcsalign_gaussian_smallerpix(h1,h2):
@@ -116,6 +116,7 @@ def test_small_into_large():
     #f1 = fits.PrimaryHDU(data=np.zeros([hdr1['NAXIS{0}'.format(ii)] for ii in range(1,4)]),
     #                     header=hdr1)
 
+    full_grid = get_cube_mapping(f2.header, hdr1)
     f2r = regrid_cube_hdu(f2,hdr1)
 
     assert f2r.shape == tuple([hdr1['NAXIS{0}'.format(ii)] for ii in range(1,4)])
@@ -124,3 +125,25 @@ def test_small_into_large():
 
     # in principle, np.nansum(f2r.data) == np.nansum(f2.data), but it appears that
     # one plane is truncated somewhere
+    # Can and should check that individual planes are not all NaN, e.g.:
+    assert np.all(f2r.data[16:-16,16:-16,16]==1)
+    if full_grid[2][32,32,47] <= 31:
+        # if floating-point issues get in the way, the edge will be
+        # prematurely truncated:
+        # 31.000000000003944 > 31
+        assert np.all(f2r.data[16:-16,16:-16,47]==1)
+        rightedge = -16
+    else:
+        assert np.all(f2r.data[16:-16,16:-16,46]==1)
+        rightedge = -17
+    assert np.all(f2r.data[16:-16,16,16:rightedge]==1)
+    assert np.all(f2r.data[16:-16,47,16:rightedge]==1)
+    assert np.all(f2r.data[16,16:-16,16:rightedge]==1)
+    assert np.all(f2r.data[47,16:-16,16:rightedge]==1)
+
+    assert np.all(np.isnan(f2r.data[16:-16,16:-16,15]))
+    assert np.all(np.isnan(f2r.data[16:-16,16:-16,48]))
+    assert np.all(np.isnan(f2r.data[16:-16,15,16:-16]))
+    assert np.all(np.isnan(f2r.data[16:-16,48,16:-16]))
+    assert np.all(np.isnan(f2r.data[15,16:-16,16:-16]))
+    assert np.all(np.isnan(f2r.data[48,16:-16,16:-16]))
