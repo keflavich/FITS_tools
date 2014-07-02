@@ -31,9 +31,9 @@ def flatten_header(header,delete=False):
         except IndexError:
             # if len(key) < 2
             pass
-    newheader.update('NAXIS',2)
+    newheader['NAXIS'] = 2
     if header.get('WCSAXES'):
-        newheader.update('WCSAXES',2)
+        newheader['WCSAXES'] = 2
 
     return newheader
 
@@ -45,24 +45,24 @@ def speccen_header(header,lon=None,lat=None):
     Assumes 3rd axis is velocity
     """
     newheader = header.copy()
-    newheader.update('CRVAL1',header.get('CRVAL3'))
-    newheader.update('CRPIX1',header.get('CRPIX3'))
+    newheader.set('CRVAL1',header.get('CRVAL3'))
+    newheader.set('CRPIX1',header.get('CRPIX3'))
     if 'CD1_1' in header: newheader.rename_key('CD1_1','OLDCD1_1')
     elif 'CDELT1' in header: newheader.rename_key('CDELT1','OLDCDEL1')
-    if 'CD3_3' in header: newheader.update('CDELT1',header.get('CD3_3'))
-    elif 'CDELT3' in header: newheader.update('CDELT1',header.get('CDELT3'))
-    newheader.update('CTYPE1','VRAD')
-    if header.get('CUNIT3'): newheader.update('CUNIT1',header.get('CUNIT3'))
+    if 'CD3_3' in header: newheader.set('CDELT1',header.get('CD3_3'))
+    elif 'CDELT3' in header: newheader.set('CDELT1',header.get('CDELT3'))
+    newheader.set('CTYPE1','VRAD')
+    if header.get('CUNIT3'): newheader.set('CUNIT1',header.get('CUNIT3'))
     else: 
         print "Assuming CUNIT3 is km/s in speccen_header"
-        newheader.update('CUNIT1','km/s')
-    newheader.update('CRPIX2',1)
-    newheader.update('CTYPE2','RA---TAN')
-    newheader.update('CRPIX3',1)
-    newheader.update('CTYPE3','DEC--TAN')
+        newheader.set('CUNIT1','km/s')
+    newheader.set('CRPIX2',1)
+    newheader.set('CTYPE2','RA---TAN')
+    newheader.set('CRPIX3',1)
+    newheader.set('CTYPE3','DEC--TAN')
 
-    if lon is not None: newheader.update('CRVAL2',lon)
-    if lat is not None: newheader.update('CRVAL3',lat)
+    if lon is not None: newheader.set('CRVAL2',lon)
+    if lat is not None: newheader.set('CRVAL3',lat)
 
     if 'CD2_2' in header: newheader.rename_key('CD2_2','OLDCD2_2')
     if 'CD3_3' in header: newheader.rename_key('CD3_3','OLDCD3_3')
