@@ -1,6 +1,8 @@
 import numpy as np
 from astropy.io import fits
 from astropy.tests.helper import pytest
+import warnings
+warnings.filterwarnings(action='error', category=DeprecationWarning)
 
 header1 = """
 SIMPLE  =                    T / conforms to FITS standard

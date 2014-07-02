@@ -20,11 +20,11 @@ def flatten_header(header,delete=False):
             if delete and int(key[-1]) >= 3 and key[:2] in ['CD','CR','CT','CU','NA']:
                 newheader.pop(key)
             elif (int(key[-1]) >= 3 or int(key[2])>=3) and key[:2] in ['CD','CR','CT','CU','NA','PC']:
-                newheader.rename_key(key,'A'+key,force=True)
+                newheader.rename_keyword(key,'A'+key,force=True)
             if delete and (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
                 newheader.pop(key)
             elif (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
-                newheader.rename_key(key,'A'+key[1:],force=True)
+                newheader.rename_keyword(key,'A'+key[1:],force=True)
         except ValueError:
             # if key[-1] is not an int
             pass
@@ -47,8 +47,8 @@ def speccen_header(header,lon=None,lat=None):
     newheader = header.copy()
     newheader.set('CRVAL1',header.get('CRVAL3'))
     newheader.set('CRPIX1',header.get('CRPIX3'))
-    if 'CD1_1' in header: newheader.rename_key('CD1_1','OLDCD1_1')
-    elif 'CDELT1' in header: newheader.rename_key('CDELT1','OLDCDEL1')
+    if 'CD1_1' in header: newheader.rename_keyword('CD1_1','OLDCD1_1')
+    elif 'CDELT1' in header: newheader.rename_keyword('CDELT1','OLDCDEL1')
     if 'CD3_3' in header: newheader.set('CDELT1',header.get('CD3_3'))
     elif 'CDELT3' in header: newheader.set('CDELT1',header.get('CDELT3'))
     newheader.set('CTYPE1','VRAD')
@@ -64,7 +64,7 @@ def speccen_header(header,lon=None,lat=None):
     if lon is not None: newheader.set('CRVAL2',lon)
     if lat is not None: newheader.set('CRVAL3',lat)
 
-    if 'CD2_2' in header: newheader.rename_key('CD2_2','OLDCD2_2')
-    if 'CD3_3' in header: newheader.rename_key('CD3_3','OLDCD3_3')
+    if 'CD2_2' in header: newheader.rename_keyword('CD2_2','OLDCD2_2')
+    if 'CD3_3' in header: newheader.rename_keyword('CD3_3','OLDCD3_3')
 
     return newheader

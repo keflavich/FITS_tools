@@ -62,6 +62,7 @@ try:
         
         return newimage
 
+
     def _load_wcs_from_header(header):
         if issubclass(pywcs.WCS, header.__class__):
             wcs = header
@@ -138,7 +139,7 @@ try:
         if convert_coordinates:
             # transform the world coordinates from the output image into the coordinate
             # system of the input image
-            C2 = csys2(lon2,lat2,unit=(u.deg,u.deg))
+            C2 = coordinates.SkyCoord(lon2,lat2,unit=(u.deg,u.deg),frame=csys2)
             C1 = C2.transform_to(csys1)
             lon2,lat2 = C1.spherical.lon.deg,C1.spherical.lat.deg
 
@@ -151,13 +152,13 @@ try:
         ctype = wcs.ctype[0]
         if 'RA' in ctype or 'DEC' in ctype:
             if wcs.equinox == 2000:
-                return coordinates.FK5
+                return 'fk5'
             elif wcs.equinox == 1950:
-                return coordinates.FK4
+                return 'fk4'
             else:
                 raise NotImplementedError("Non-fk4/fk5 equinoxes are not allowed")
         elif 'GLON' in ctype or 'GLAT' in ctype:
-            return coordinates.Galactic
+            return 'galactic'
 
     def hcongrid_hdu(hdu_in, header, **kwargs):
         """
@@ -213,6 +214,12 @@ try:
         up_hdu = pyfits.PrimaryHDU(data=upscaled, header=h)
         
         return up_hdu
+
+    # hastrom and hcongrid are basically the same...?
+    # http://idlastro.gsfc.nasa.gov/ftp/pro/astrom/hastrom.pro
+    # http://idlastro.gsfc.nasa.gov/ftp/pro/astrom/hcongrid.pro
+    hastrom = hcongrid
+    hastrom_hdu = hcongrid_hdu
 
 except ImportError:
     # needed to do this to get travis-ci tests to pass, even though scipy is installed...
