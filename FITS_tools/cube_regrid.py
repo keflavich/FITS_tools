@@ -135,7 +135,8 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
     if grid[0].ndim != full_grid[0].ndim:
         raise ValueError("Grid dropped a dimension.  This is not possible.")
 
-    limit_slice = [slice(m[0],m[1]+1) for m in grid_limits]
+    # Negative coordinates will truncate the cube inappropriately from the far side
+    limit_slice = [slice((m[0]) if m[0]>0 else 0, (m[1]+1)) for m in grid_limits]
     cubedata = cubedata[limit_slice]
 
     bad_pixels = np.isnan(cubedata) + np.isinf(cubedata)
@@ -166,7 +167,7 @@ def find_grid_limits(grid):
     passing it to, e.g., `scipy.ndimage.map_coordinates` to reduce the memory
     use
     """
-    return [(np.floor(np.nanmin(g)),np.ceil(np.nanmax(g))) for g in grid]
+    return [(int(np.floor(np.nanmin(g))),int(np.ceil(np.nanmax(g)))) for g in grid]
 
 def get_cube_mapping(header1, header2):
     """
