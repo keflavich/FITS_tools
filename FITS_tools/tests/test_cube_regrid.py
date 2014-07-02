@@ -79,7 +79,7 @@ SPECSYS = 'LSRK'
 END
 """.strip().lstrip()
 
-from ..cube_regrid import regrid_cube
+from ..cube_regrid import regrid_cube,regrid_cube_hdu
 
 @pytest.mark.parametrize(('h1','h2'),zip((header1,header2,header3),(header2,header3,header1)))
 def test_wcsalign_gaussian_smallerpix(h1,h2):
@@ -100,3 +100,27 @@ def test_wcsalign_gaussian_smallerpix(h1,h2):
     hdu_out = regrid_cube(hdu_in.data, hdu_in.header, hdr2)
 
     return hdu_out
+
+def test_small_into_large():
+
+    hdr1 = fits.Header().fromstring(header1,'\n')
+
+    hdr2 = hdr1.copy()
+
+    for ii in range(1,4):
+        hdr2['NAXIS{0}'.format(ii)] = int(hdr1['NAXIS{0}'.format(ii)] / 2)
+        hdr2['CRPIX{0}'.format(ii)] = (hdr1['CRPIX{0}'.format(ii)] - 1) / 2. + 1
+
+    f2 = fits.PrimaryHDU(data=np.ones([hdr2['NAXIS{0}'.format(ii)] for ii in range(1,4)]),
+                         header=hdr2)
+    #f1 = fits.PrimaryHDU(data=np.zeros([hdr1['NAXIS{0}'.format(ii)] for ii in range(1,4)]),
+    #                     header=hdr1)
+
+    f2r = regrid_cube_hdu(f2,hdr1)
+
+    assert f2r.shape == tuple([hdr1['NAXIS{0}'.format(ii)] for ii in range(1,4)])
+    assert np.count_nonzero(np.isnan(f2r.data)) > 0
+    assert f2r.data[np.isfinite(f2r.data)].sum() > 0
+
+    # in principle, np.nansum(f2r.data) == np.nansum(f2.data), but it appears that
+    # one plane is truncated somewhere
