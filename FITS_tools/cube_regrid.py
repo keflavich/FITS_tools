@@ -50,7 +50,7 @@ def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
     Returns
     -------
     rgcube : `~astropy.io.fits.PrimaryHDU`
-        The regridded cube
+        The regridded cube HDU
     """
     cube_hdu = fits.open(cubefilename)[hdu]
     rgcube = regrid_cube_hdu(cube_hdu, outheader)
@@ -81,7 +81,8 @@ def regrid_cube_hdu(hdu, outheader, smooth=False, **kwargs):
 
     Returns
     -------
-    Regridded HDU
+    rgcube : `~astropy.io.fits.PrimaryHDU`
+        The regridded cube HDU
     """
 
     outheader = load_header(outheader)
@@ -127,6 +128,11 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
         The mode of treatment of out-of-bounds pixels; can be 'constant',
         'wrap', 'reflect', or 'nearest'.  See
         `~scipy.ndimage.interpolation.map_coordinates` for details.
+
+    Returns
+    -------
+    newcubedata : `~numpy.ndarray`
+        The regridded cube
     """
 
     if cubedata.ndim != 3:
