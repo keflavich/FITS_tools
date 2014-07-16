@@ -223,13 +223,14 @@ def gsmooth_cube(cube, kernelsize, use_fft=True, psf_pad=False, fft_pad=False,
     
     #z,y,x = np.indices(cube.shape)
     # use an odd kernel size for non-fft, even kernel size for fft
-    ks = np.array(kernelsize)*kernelsize_mult
+    ks = (np.array(kernelsize)*kernelsize_mult).astype('int')
     if np.any(ks % 2 == 0) and not use_fft:
         ks[ks % 2 == 0] += 1
+
     z,y,x = np.indices(ks)
-    kernel = np.exp(-((x-x.max()/2.)**2 / (2*(kernelsize[2])**2) +
-                      (y-y.max()/2.)**2 / (2*(kernelsize[1])**2) +
-                      (z-z.max()/2.)**2 / (2*(kernelsize[0])**2)))
+    kernel = np.exp(-((x-x.max()/2.)**2 / (2.*(kernelsize[2])**2) +
+                      (y-y.max()/2.)**2 / (2.*(kernelsize[1])**2) +
+                      (z-z.max()/2.)**2 / (2.*(kernelsize[0])**2)))
 
     if use_fft:
         return convolve_fft(cube, kernel, normalize_kernel=True,
