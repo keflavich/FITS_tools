@@ -101,7 +101,7 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
     # project image 1 to image 2 coordinates
     image1_projected = project_to_header(fitsfile1, header, **kwargs)
 
-    if image1.shape != image2_projected.shape:
+    if image1_projected.shape != image2.shape:
         raise ValueError("Failed to reproject images to same shape.")
 
     if sigma_cut:
