@@ -1,8 +1,4 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from cube_regrid import regrid_fits_cube,regrid_cube_hdu,regrid_cube
-import header_tools
-import spectral_regrid
-
 """
 This is an Astropy affiliated package.
 """
@@ -38,3 +34,7 @@ if not _ASTROPY_SETUP_:
     from match_images import project_to_header,match_fits
     from fits_overlap import fits_overlap,header_overlap
     import hcongrid,spectral_regrid
+    from cube_regrid import regrid_fits_cube,regrid_cube_hdu,regrid_cube
+    import header_tools
+    import spectral_regrid
+
