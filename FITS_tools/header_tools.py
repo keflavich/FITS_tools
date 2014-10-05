@@ -146,11 +146,6 @@ def enclosing_header(header1, header2, wrapangle=180*u.deg):
 
     (xref, yref), = w2.wcs_world2pix([[(max(llow,lhi)).deg,
                                        (min(blow,bhi)).deg]], 0)
-    print cedges1, cedges2
-    print llow.deg, lhi.deg
-    print blow.deg, bhi.deg
-    print xref, yref
-    print int(np.ceil(np.abs(xhi-xlow))),int(np.ceil(np.abs(yhi-ylow)))
 
     header = header2.copy()
     header['NAXIS1'] = int(np.ceil(np.abs(xhi-xlow)))
