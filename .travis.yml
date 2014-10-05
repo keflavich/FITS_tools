@@ -47,9 +47,7 @@ matrix:
         - python: 2.6
           env: SETUP_CMD='test'
         - python: 2.7
-          env: SETUP_CMD='test' YT=yes
-        - python: 2.7
-          env: SETUP_CMD='test' YT=no
+          env: SETUP_CMD='test'
         - python: 3.2 # not compatible with 1.9 in conda
           env: SETUP_CMD='test' NUMPY_VERSION=1.8
         - python: 3.3
@@ -69,16 +67,6 @@ matrix:
         - python: 2.7
           env: NUMPY_VERSION=1.5 SETUP_CMD='test'
 
-        # Test with bottleneck
-        - python: 2.7
-          env: ASTROPY_VERSION=stable SETUP_CMD='test' bottleneck=yes NUMPY_VERSION=1.8
-        - python: 3.4
-          env: ASTROPY_VERSION=stable SETUP_CMD='test' bottleneck=yes NUMPY_VERSION=1.8
-        - python: 2.7
-          env: ASTROPY_VERSION=stable SETUP_CMD='test' bottleneck=yes NUMPY_VERSION=1.9
-        - python: 3.4
-          env: ASTROPY_VERSION=stable SETUP_CMD='test' bottleneck=yes NUMPY_VERSION=1.9
-
 before_install:
 
     # Use utf8 encoding. Should be default, but this is insurance against
@@ -97,7 +85,6 @@ install:
 
     # CONDA
     - conda create --yes -n test -c astropy-ci-extras python=$TRAVIS_PYTHON_VERSION
-    - $CONDA_INSTALL scipy astropy
     - source activate test
 
     # CORE DEPENDENCIES
@@ -108,16 +95,12 @@ install:
     - if [[ $SETUP_CMD != egg_info ]] && [[ $ASTROPY_VERSION == development ]]; then $PIP_INSTALL git+http://github.com/astropy/astropy.git#egg=astropy; fi
     - if [[ $SETUP_CMD != egg_info ]] && [[ $ASTROPY_VERSION == stable ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION astropy; fi
 
-    # YT
-    - if [[ $SETUP_CMD != egg_info ]] && [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] && [[ $NUMPY_VERSION == 1.8 ]] && [[ $YT == yes ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION yt; fi
-
-
     # OPTIONAL DEPENDENCIES
     # Here you can add any dependencies your package may have. You can use
     # conda for packages available through conda, or pip for any other
     # packages. You should leave the `numpy=$NUMPY_VERSION` in the `conda`
     # install since this ensures Numpy does not get automatically upgraded.
-    # - if [[ $SETUP_CMD != egg_info ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION ... ; fi
+    - if [[ $SETUP_CMD != egg_info ]]; then $CONDA_INSTALL scipy; fi
     # - if [[ $SETUP_CMD != egg_info ]]; then $PIP_INSTALL ...; fi
 
     # DOCUMENTATION DEPENDENCIES
