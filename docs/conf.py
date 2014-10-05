@@ -169,6 +169,9 @@ for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
 
 
+# Added because of http://stackoverflow.com/questions/12206334/sphinx-autosummary-toctree-contains-reference-to-nonexisting-document-warnings
+numpydoc_show_class_members = False
+
 ## -- Options for the edit_on_github extension ----------------------------------------
 
 if eval(setup_cfg.get('edit_on_github')):
