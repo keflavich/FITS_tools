@@ -97,6 +97,7 @@ install:
 
     # CONDA
     - conda create --yes -n test -c astropy-ci-extras python=$TRAVIS_PYTHON_VERSION
+    - $CONDA_INSTALL scipy astropy
     - source activate test
 
     # CORE DEPENDENCIES
@@ -110,9 +111,6 @@ install:
     # YT
     - if [[ $SETUP_CMD != egg_info ]] && [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] && [[ $NUMPY_VERSION == 1.8 ]] && [[ $YT == yes ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION yt; fi
 
-    # Bottleneck
-    # asmeurer currently (8/26/2014) supports numpy 1.8
-    - if [[ $SETUP_CMD != egg_info ]] && [[ $BOTTLENECK == yes ]] && [[ $NUMPY_VERSION == 1.8 ]]; then $CONDA_INSTALL --channel https://conda.binstar.org/asmeurer bottleneck; fi
 
     # OPTIONAL DEPENDENCIES
     # Here you can add any dependencies your package may have. You can use
