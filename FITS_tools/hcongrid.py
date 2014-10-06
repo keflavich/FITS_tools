@@ -4,6 +4,8 @@ import astropy.wcs as pywcs
 from astropy import coordinates
 from astropy import units as u
 
+__doctest_skip__ = ['hcongrid']
+
 try:
     import scipy.ndimage
 
@@ -37,10 +39,9 @@ try:
 
         Examples
         --------
-        (not written with >>> because test.fits/test2.fits do not exist)
-        fits1 = pyfits.open('test.fits')
-        target_header = pyfits.getheader('test2.fits')
-        new_image = hcongrid(fits1[0].data, fits1[0].header, target_header)
+        >>> fits1 = pyfits.open('test.fits')
+        >>> target_header = pyfits.getheader('test2.fits')
+        >>> new_image = hcongrid(fits1[0].data, fits1[0].header, target_header)
 
         """
     
@@ -108,8 +109,9 @@ try:
 
         Raises
         ------
-        TypeError if either header is not a Header or WCS instance
-        NotImplementedError if the CTYPE in the header is not recognized
+        TypeError :
+            If either header is not a Header or WCS instance
+            NotImplementedError if the CTYPE in the header is not recognized
         """
 
         wcs1 = _load_wcs_from_header(header1)

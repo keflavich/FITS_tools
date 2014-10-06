@@ -8,6 +8,9 @@ from astropy import log
 from .load_header import get_cd
 from .hcongrid import _ctype_to_csys
 
+__all__ = ["enclosing_header", "header_to_platescale", "smoothing_kernel_size",
+           "wcs_to_platescale",]
+
 def header_to_platescale(header, **kwargs):
     """
     Attempt to determine the spatial platescale from a

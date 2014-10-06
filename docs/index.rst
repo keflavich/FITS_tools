@@ -5,9 +5,8 @@ This is an affiliated package for the AstroPy package. The documentation for
 this package is here:
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
 
-  packagename/index.rst
   fits_tools.rst
 
 .. note:: Do not edit this page - instead, place all documentation for the
