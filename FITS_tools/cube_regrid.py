@@ -7,7 +7,7 @@ import warnings
 from astropy.convolution import Gaussian2DKernel,Gaussian1DKernel
 import itertools
 import copy
-from contextlib import contextmanager
+import contextlib
 import __builtin__
 from astropy import log
 
@@ -17,11 +17,10 @@ from .hcongrid import get_pixel_mapping
 from .strip_headers import flatten_header
 from .load_header import load_header,get_cd
 
-spectral_smooth_cube__all__ = ["downsample_cube", "get_cube_mapping",
-                               "gsmooth_cube", "regrid_cube",
-                               "regrid_cube_hdu", "regrid_fits_cube",
-                               "smoothing_kernel_size", "spatial_smooth_cube",
-                               ]
+__all__ = ["downsample_cube", "get_cube_mapping", "gsmooth_cube",
+           "regrid_cube", "regrid_cube_hdu", "regrid_fits_cube",
+           "smoothing_kernel_size", "spatial_smooth_cube",
+           'spectral_smooth_cube', 'find_grid_limits']
 
 def regrid_fits_cube(cubefilename, outheader, hdu=0, outfilename=None,
                      clobber=False, **kwargs):
@@ -436,7 +435,7 @@ def downsample_cube(cubehdu, factor, spectralaxis=None):
     return hdu
 
 
-@contextmanager
+@contextlib.contextmanager
 def _map_context(numcores):
     if numcores is not None and numcores > 1:
         try:

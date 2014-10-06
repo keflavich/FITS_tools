@@ -5,6 +5,9 @@ from .strip_headers import flatten_header
 from .cube_regrid import regrid_cube_hdu
 from .load_header import load_header
 
+__all__ = ['match_fits', 'match_fits_cubes', 'project_to_header']
+
+
 def project_to_header(fitsfile, header, use_montage=True, quiet=True,
                       **kwargs):
     """
