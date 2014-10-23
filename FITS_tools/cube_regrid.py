@@ -163,6 +163,8 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
 
     cubedata[bad_pixels] = 0
 
+    dtype_in = cubedata.dtype
+
     # There appears to be a bug in scipy that affects only large arrays:
     # cubedata will be forcibly converted to float64 unless order == 1
     # but maybe it has to be float64?
@@ -183,7 +185,7 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
                                                mode='constant', cval=True)
         newcubedata[newbad.astype('bool')] = np.nan
     
-    return newcubedata
+    return newcubedata.astype(dtype_in)
 
 def find_grid_limits(grid):
     """
