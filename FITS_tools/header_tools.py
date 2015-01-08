@@ -101,8 +101,8 @@ def enclosing_header(header1, header2, wrapangle=180*u.deg):
     Find the smallest header that encloses both header1 and header2 in the
     frame of header2
     """
-    log.warning("Does not work exactly - there is at least a few-pixel offset"
-                " in the result.  Need a good test suite.")
+    log.warning("'Enclosing Header' does not work exactly - there is at least "
+                "a few-pixel offset in the result.  Need a good test suite.")
     w1 = wcs.WCS(header1).sub([WCSSUB_CELESTIAL])
     w2 = wcs.WCS(header2).sub([WCSSUB_CELESTIAL])
 
