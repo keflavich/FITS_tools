@@ -131,7 +131,10 @@ try:
         else:
             convert_coordinates = False
 
-        # sigh... why does numpy use matrix convention?  Makes everything so much harder...
+        # sigh... why does numpy use matrix convention?  Makes everything so
+        # much harder...
+        # WCS has naxis attributes because it is loaded with
+        # _load_wcs_from_header
         outshape = [wcs2.naxis2,wcs2.naxis1]
         yy2,xx2 = np.indices(outshape)
 
