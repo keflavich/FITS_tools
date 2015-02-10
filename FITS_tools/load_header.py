@@ -2,17 +2,18 @@ from astropy.io import fits
 import numpy as np
 import warnings
 
-def load_header(header):
+def load_header(header, extnum=0):
     """
     Attempt to load a header specified as a header, a string pointing to a FITS
     file, or a string pointing to a Header text file, or a string that contains
     the actual header
     """
     if hasattr(header,'get'):
+        # dict or Header
         return fits.Header(header)
     try:
         # assume fits file first
-        return fits.getheader(header)
+        return fits.getheader(header, extnum=extnum)
     except IOError:
         # assume header textfile
         try:
@@ -20,7 +21,7 @@ def load_header(header):
         except IOError:
             return fits.Header().fromstring(header,'\n')
 
-def load_data(data):
+def load_data(data, extnum=0):
     """
     Attempt to load a header specified as a header, a string pointing to a FITS
     file, or a string pointing to a Header text file, or a string that contains
@@ -30,7 +31,7 @@ def load_data(data):
         return data
     try:
         # assume fits file first
-        return fits.getheader(data)
+        return fits.getdata(data, extnum=extnum)
     except IOError:
         # assume an HDU
         if hasattr(data,'data') and isinstance(data.data,np.ndarray):
