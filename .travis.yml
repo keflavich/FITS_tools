@@ -1,10 +1,20 @@
 language: python
 
 python:
-    #- 2.6 apparently not supported by PYAST
     - 2.7
     - 3.3
     - 3.4
+
+# Setting sudo to false opts in to Travis-CI container-based builds.
+sudo: false
+
+addons:
+    apt:
+        packages:
+            - graphviz
+            - texlive-latex-extra
+            - dvipng
+
     # This is just for "egg_info".  All other builds are explicitly given in the matrix
 env:
     global:
@@ -24,7 +34,7 @@ env:
 matrix:
     include:
 
-        # Do a coverage test in Python 2. 
+        # Do a coverage test in Python 2.
         - python: 2.7
           env: SETUP_CMD='test --coverage'
 
@@ -78,8 +88,6 @@ before_install:
     - export PATH=/home/travis/miniconda/bin:$PATH
     - conda update --yes conda
 
-    # DOCUMENTATION DEPENDENCIES
-    - if [[ $SETUP_CMD == build_sphinx* ]]; then sudo apt-get install graphviz texlive-latex-extra dvipng; fi
 
 install:
 
