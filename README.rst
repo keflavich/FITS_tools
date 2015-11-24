@@ -14,8 +14,10 @@ Option 2. ``pip install https://github.com/keflavich/FITS_tools/archive/master.z
 Requirements:
 
  * `astropy <astropy.org>`_
+ * `numpy <numpy.org>`_
  * `scipy <scipy.org>`_
 
+ * `starlink-pyast <http://timj.github.io/starlink-pyast/pyast.html>`_ (optional)
 
 
 Regridding Tools
