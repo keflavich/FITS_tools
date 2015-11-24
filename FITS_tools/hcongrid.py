@@ -3,6 +3,7 @@ import astropy.io.fits as pyfits
 import astropy.wcs as pywcs
 from astropy import coordinates
 from astropy import units as u
+import scipy.ndimage
 
 __doctest_skip__ = ['hcongrid']
 
@@ -42,11 +43,6 @@ def hcongrid(image, header1, header2, preserve_bad_pixels=True, **kwargs):
     >>> new_image = hcongrid(fits1[0].data, fits1[0].header, target_header)
 
     """
-    try:
-        import scipy.ndimage
-    except ImportError:
-        raise ImportError("scipy.ndimage could not be imported; "
-                          "hcongrid is not available")
 
     _check_header_matches_image(image, header1)
 
@@ -201,12 +197,6 @@ def zoom_fits(fitsfile, scalefactor, preserve_bad_pixels=True, **kwargs):
         Try to set NAN pixels to NAN in the zoomed image.  Otherwise, bad
         pixels will be set to zero
     """
-
-    try:
-        import scipy.ndimage
-    except ImportError:
-        raise ImportError("scipy.ndimage could not be imported; "
-                          "zoom_fits is not available")
 
     arr = pyfits.getdata(fitsfile)
     h = pyfits.getheader(fitsfile)
