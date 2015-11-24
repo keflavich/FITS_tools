@@ -64,7 +64,7 @@ matrix:
 
         # try pyast:
         - python: 2.7
-          env: PIP_DEPENDENCIES='https://github.com/timj/starlink-pyast/archive/master.zip'
+          env: PIP_DEPENDENCIES='starlink-pyast'
 
 before_install:
     - git clone git://github.com/astropy/ci-helpers.git
