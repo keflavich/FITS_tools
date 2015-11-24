@@ -2,6 +2,13 @@ import numpy as np
 from astropy.io import fits
 from astropy.tests.helper import pytest
 
+try:
+    import starlink
+    HAS_STARLINK = True
+except ImportError:
+    HAS_STARLINK = False
+
+
 header1 = """
 SIMPLE  =                    T / conforms to FITS standard
 BITPIX  =                  -64 / array data type
@@ -53,38 +60,43 @@ CDELT2  =              0.00225 / Pixel size on axis 2
 END
 """.strip().lstrip()
 
-from ..hcongrid import hcongrid,wcsalign
+from ..hcongrid import wcsalign
 
-@pytest.mark.parametrize(('h1','h2'),zip((header1,header2,header3),(header1,header2,header3)))
-def test_wcsalign_gaussian_smallerpix(h1,h2):
+
+@pytest.mark.skipif('not HAS_STARLINK')
+@pytest.mark.parametrize(('h1', 'h2'), zip((header1, header2, header3),
+                                           (header1, header2, header3)))
+def test_wcsalign_gaussian_smallerpix(h1, h2):
     """
     Reproject different coordinate systems
     """
 
-    x,y = np.mgrid[:128,:128]
+    x,y = np.mgrid[:128, :128]
     r = ((x-63.5)**2 + (y-63.5)**2)**0.5
     e = np.exp(-r**2/(2.*10.**2))
 
-    hdr1 = fits.Header().fromstring(h1,'\n')
+    hdr1 = fits.Header().fromstring(h1, '\n')
     hdu_in = fits.PrimaryHDU(data=e, header=hdr1)
-    hdr2 = fits.Header().fromstring(h2,'\n')
+    hdr2 = fits.Header().fromstring(h2, '\n')
 
     hdu_out = wcsalign(hdu_in, hdr2)
 
     return hdu_out
 
+
+@pytest.mark.skipif('not HAS_STARLINK')
 def test_hcongrid_gaussian_smallerpix():
     """
     Reproject RA/Dec -> RA/Dec with smaller pixels
     """
 
-    x,y = np.mgrid[:128,:128]
+    x,y = np.mgrid[:128, :128]
     r = ((x-63.5)**2 + (y-63.5)**2)**0.5
     e = np.exp(-r**2/(2.*10.**2))
 
-    hdr1 = fits.Header().fromstring(header2,'\n')
+    hdr1 = fits.Header().fromstring(header2, '\n')
     hdu_in = fits.PrimaryHDU(data=e, header=hdr1)
-    hdr2 = fits.Header().fromstring(header3,'\n')
+    hdr2 = fits.Header().fromstring(header3, '\n')
 
     hdu_out = wcsalign(hdu_in, hdr2)
 
