@@ -60,3 +60,16 @@ except AttributeError:
 
     def downsample_axis(*args, **kwargs):
         raise AttributeError("This version of numpy doesn't possess a nanmean.")
+
+def downsample_header(header, factor, axis):
+    """
+    Downsample a FITS header along an axis using the FITS convention for axis number
+    """
+
+    cd = 'CDELT{0:d}'.format(axis)
+    cp = 'CRPIX{0:d}'.format(axis)
+    header[cp] = (header[cp]-1)*header[cd]/float(factor)+1.
+    header[cd] = header[cd]/factor
+
+    return header
+
