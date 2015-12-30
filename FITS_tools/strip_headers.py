@@ -21,9 +21,10 @@ def flatten_header(header,delete=False):
                 newheader.pop(key)
             elif (int(key[-1]) >= 3 or int(key[2])>=3) and key[:2] in ['CD','CR','CT','CU','NA','PC']:
                 newheader.rename_keyword(key,'A'+key,force=True)
-            if delete and (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
+            if delete and (int(key[3]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
+                # for PC03_04 etc
                 newheader.pop(key)
-            elif (int(key[4]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
+            elif (int(key[3]) >= 3 or int(key[7]) >= 3) and key[:2]=='PC' and key in newheader:
                 newheader.rename_keyword(key,'A'+key[1:],force=True)
         except ValueError:
             # if key[-1] is not an int
