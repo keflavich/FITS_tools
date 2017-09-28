@@ -31,10 +31,10 @@ if not _ASTROPY_SETUP_:
 
     del os, warn, config_dir  # clean up namespace
 
-    from match_images import project_to_header,match_fits
-    from fits_overlap import fits_overlap,header_overlap
-    import hcongrid,spectral_regrid
-    from cube_regrid import regrid_fits_cube,regrid_cube_hdu,regrid_cube
-    import header_tools
-    import spectral_regrid
+    from .match_images import project_to_header,match_fits
+    from .fits_overlap import fits_overlap,header_overlap
+    from . import hcongrid,spectral_regrid
+    from .cube_regrid import regrid_fits_cube,regrid_cube_hdu,regrid_cube
+    from . import header_tools
+    from . import spectral_regrid
 

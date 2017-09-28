@@ -112,7 +112,7 @@ def match_fits(fitsfile1, fitsfile2, header=None, sigma_cut=False,
         corr_image2 = image2*(image2 > image2.std()*sigma_cut)
         OK = (corr_image1==corr_image1)*(corr_image2==corr_image2)
         if (corr_image1[OK]*corr_image2[OK]).sum() == 0:
-            print "Could not use sigma_cut of %f because it excluded all valid data" % sigma_cut
+            print("Could not use sigma_cut of %f because it excluded all valid data" % sigma_cut)
             corr_image1 = image1_projected
             corr_image2 = image2
     else:

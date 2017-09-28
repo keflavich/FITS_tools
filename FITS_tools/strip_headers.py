@@ -55,7 +55,7 @@ def speccen_header(header,lon=None,lat=None):
     newheader.set('CTYPE1','VRAD')
     if header.get('CUNIT3'): newheader.set('CUNIT1',header.get('CUNIT3'))
     else: 
-        print "Assuming CUNIT3 is km/s in speccen_header"
+        print("Assuming CUNIT3 is km/s in speccen_header")
         newheader.set('CUNIT1','km/s')
     newheader.set('CRPIX2',1)
     newheader.set('CTYPE2','RA---TAN')
