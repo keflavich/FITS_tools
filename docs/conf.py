@@ -42,12 +42,19 @@ except ImportError:
 from astropy_helpers.sphinx.conf import *
 
 # Get configuration information from setup.cfg
-from distutils import config
-conf = config.ConfigParser()
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
+conf = ConfigParser()
+
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
 
 # -- General configuration ----------------------------------------------------
+
+# By default, highlight as Python 3.
+highlight_language = 'python3'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.2'
@@ -65,7 +72,6 @@ exclude_patterns.append('_templates')
 rst_epilog += """
 """
 
-intersphinx_mapping['astropy'] = ('http://docs.astropy.org/en/latest/', None)
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -96,6 +102,7 @@ release = package.__version__
 # variables set in the global configuration. The variables set in the
 # global configuration are listed below, commented out.
 
+# Please update these texts to match the name of your package.
 html_theme_options = {
     'logotext1': 'FITS',  # white,  semi-bold
     'logotext2': 'tools',  # orange, light
@@ -112,6 +119,10 @@ html_theme_options = {
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+#html_logo = ''
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
