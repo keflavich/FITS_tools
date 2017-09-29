@@ -8,8 +8,10 @@ from astropy.convolution import Gaussian2DKernel,Gaussian1DKernel
 import itertools
 import copy
 import contextlib
-import __builtin__
-from astropy import log
+try:
+    import __builtin__ as builtins
+except ImportError:
+    import builtins
 
 from .downsample import downsample_axis
 from .spectral_regrid import get_spectral_mapping
@@ -446,12 +448,12 @@ def _map_context(numcores):
             map = p.map
             parallel = True
         except ImportError:
-            map = __builtin__.map
+            map = builtins.map
             warnings.warn("Could not import multiprocessing.  map will be non-parallel.")
             parallel = False
     else:
         parallel = False
-        map = __builtin__.map
+        map = builtins.map
 
     try:
         yield map

@@ -5,7 +5,7 @@ from astropy import coordinates
 from astropy import units as u
 import scipy.ndimage
 
-__doctest_skip__ = ['hcongrid']
+__doctest_skip__ = ['*']
 
 
 def hcongrid(image, header1, header2, preserve_bad_pixels=True, **kwargs):
