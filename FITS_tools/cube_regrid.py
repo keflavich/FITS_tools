@@ -157,8 +157,8 @@ def regrid_cube(cubedata, cubeheader, targetheader, preserve_bad_pixels=True,
     # the output grid.  If the input cube is smaller, m[1]+1 should be (at
     # least) the "right side" of the frame and therefore all data should be
     # included.  The +1 is because of python indexing conventions
-    limit_slice = [slice((m[0]) if m[0]>0 else 0, (m[1]+1))
-                   for m in grid_limits]
+    limit_slice = tuple(slice((m[0]) if m[0]>0 else 0, (m[1]+1))
+                   for m in grid_limits)
     cubedata = cubedata[limit_slice]
 
     bad_pixels = np.isnan(cubedata) + np.isinf(cubedata)

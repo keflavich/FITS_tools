@@ -32,7 +32,7 @@ try:
             if truncate:
                 view = [slice(None) for ii in range(myarr.ndim)]
                 view[axis] = slice(None,xs-(xs % int(factor)))
-                crarr = myarr[view]
+                crarr = myarr[tuple(view)]
             else:
                 newshape = list(myarr.shape)
                 newshape[axis] = (factor - xs % int(factor))
@@ -46,7 +46,7 @@ try:
             view = [slice(None) for ii in range(myarr.ndim)]
             # then fill the appropriate slice
             view[axis] = slice(startpoint,None,step)
-            return view
+            return tuple(view)
 
         # The extra braces here are crucial: We're adding an extra dimension so we
         # can average across it!
