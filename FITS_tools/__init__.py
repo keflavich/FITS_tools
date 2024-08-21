@@ -28,6 +28,10 @@ if not _ASTROPY_SETUP_:
                     "importing from source, this is expected.")
             warn(config.configuration.ConfigurationDefaultMissingWarning(wmsg))
             del e
+        except AttributeError as e:
+            wmsg = (e.args[0] + ", which has been deprecated in astropy 6.1.1.")
+            warn(wmsg)
+            del e
 
     del os, warn, config_dir  # clean up namespace
 
