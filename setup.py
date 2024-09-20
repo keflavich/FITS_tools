@@ -5,12 +5,12 @@ from setuptools import setup, find_packages
 
 # Get metadata from setup.cfg (optional) or directly include here
 PACKAGENAME = 'FITS_tools'
-DESCRIPTION = 'Tools for manipulating FITS files'
+DESCRIPTION = 'Tools for manipulating FITS images using primarily scipy & native python routines'
 AUTHOR = 'Adam Ginsburg'
 AUTHOR_EMAIL = 'adam.g.ginsburg@gmail.com'
 LICENSE = 'BSD'
 URL = 'http://github.com/keflavich/FITS_tools/'
-VERSION = '0.1.1'
+VERSION = '0.3.1.dev'
 
 # Modernized setup
 setup(
