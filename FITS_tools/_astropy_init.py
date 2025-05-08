@@ -114,6 +114,7 @@ if not _ASTROPY_SETUP_:
     import os
     from warnings import warn
     from astropy import config
+    from astropy.config import paths
 
     # add these here so we only need to cleanup the namespace at the end
     config_dir = None
@@ -123,16 +124,10 @@ if not _ASTROPY_SETUP_:
         config_template = os.path.join(config_dir, __package__ + ".cfg")
         if os.path.isfile(config_template):
             try:
-                config.configuration.update_default_config(
-                    __package__, config_dir, version=__version__)
-            except TypeError as orig_error:
-                try:
-                    config.configuration.update_default_config(
-                        __package__, config_dir)
-                except config.configuration.ConfigurationDefaultMissingError as e:
-                    wmsg = (e.args[0] + " Cannot install default profile. If you are "
-                            "importing from source, this is expected.")
-                    warn(config.configuration.ConfigurationDefaultMissingWarning(wmsg))
-                    del e
-                except:
-                    raise orig_error
+                # Use the modern configuration system
+                paths.set_temp_config(config_dir)
+                config.load_config(__package__, version=__version__)
+            except Exception as e:
+                wmsg = (f"Error loading configuration: {str(e)}. If you are "
+                       "importing from source, this is expected.")
+                warn(wmsg)
